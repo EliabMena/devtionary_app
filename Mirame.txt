@@ -1,0 +1,21 @@
+ESTRUCUTA DEL PROYECTO
+
+lib/
+├── api/
+│   └── api_keys.dart           # Configuraciones y API Keys
+├── utility/
+│   ├── themes/
+│   │   └── app_colors.dart     # Definición de colores
+│   └── validations/
+│       ├── email_validation.dart  # Validación específica de email
+│       ├── password_validation.dart # Validación específica de contraseña
+│       └── ... (otras validaciones, separadas en archivos)
+├── widgets/
+│   ├── custom_button.dart
+│   ├── text_input_field.dart
+│   └── ... (otros widgets reutilizables)
+├── screens/ (o pages/)
+│   ├── home_screen.dart
+│   ├── login_screen.dart
+│   └── ... (pantallas completas)
+└── main.dart
