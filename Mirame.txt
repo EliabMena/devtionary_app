@@ -1,5 +1,8 @@
 ESTRUCUTA DEL PROYECTO
 
+TODO LIST
+Falata hacer que los campos de contraseña no muestre directamente el texto
+
 lib/
 ├── api/
 │   └── api_keys.dart           # Configuraciones y API Keys
