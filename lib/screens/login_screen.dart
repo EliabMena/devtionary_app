@@ -34,9 +34,99 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   // Variables para validaciones
-  // Email
   bool hasErrorEmail = false;
   String? errorMessageEmail;
+  bool hasErrorPassword = false;
+  String? errorMessagePassword;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  // Validación de email en tiempo real
+  void _validateEmail(String email) {
+    String? error = EmailValidation.validateEmail(email);
+    setState(() {
+      errorMessageEmail = error;
+      hasErrorEmail = error != null;
+    });
+  }
+
+  // Validación de contraseña
+  void _validatePassword(String password) {
+    setState(() {
+      if (password.isEmpty) {
+        errorMessagePassword = 'La contraseña es requerida';
+        hasErrorPassword = true;
+      } else if (password.length < 6) {
+        errorMessagePassword = 'La contraseña debe tener al menos 6 caracteres';
+        hasErrorPassword = true;
+      } else {
+        errorMessagePassword = null;
+        hasErrorPassword = false;
+      }
+    });
+  }
+
+  // Verificar si todos los campos son válidos
+  bool _areAllFieldsValid() {
+    return !hasErrorEmail &&
+        !hasErrorPassword &&
+        _emailController.text.isNotEmpty &&
+        _passwordController.text.isNotEmpty;
+  }
+
+  // Mostrar mensajes al usuario
+  void _showMessage(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: isError ? Colors.red : Colors.green,
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+  // Navegación a la pantalla de registro
+  void _navigateToRegister() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => RegisterScreen()),
+    );
+  }
+
+  // Manejar el inicio de sesión con email y contraseña
+  Future<void> _handleLogin() async {
+    // Validar todos los campos
+    _validateEmail(_emailController.text);
+    _validatePassword(_passwordController.text);
+
+    if (!_areAllFieldsValid()) {
+      _showMessage('Por favor, corrige los errores antes de continuar', isError: true);
+      return;
+    }
+
+    // TODO: Implementar lógica de autenticación con backend
+    _showMessage('Funcionalidad de login en desarrollo');
+    print('Login attempt with email: ${_emailController.text}');
+  }
+
+  // Manejar el inicio de sesión con Google
+  Future<void> _handleGoogleLogin() async {
+    // TODO: Implementar lógica de autenticación con Google
+    _showMessage('Funcionalidad de Google login en desarrollo');
+    print('Google login attempt');
+  }
 
   /*
    * Método para construir la interfaz de usuario de la pantalla de login.
@@ -89,8 +179,8 @@ class _LoginScreenState extends State<LoginScreen> {
             stops: [0.2, 0.4, 0.7], // Ajuste de donde Inicia el degradado y termina
             center: Alignment.bottomCenter,
             radius: MediaQuery.of(context).viewInsets.bottom > 0
-                ? 1.6 // Gradiente más grande cuando hay teclado
-                : 1, // Gradiente normal sin teclado
+                ? 1.5 // Gradiente más grande cuando hay teclado
+                : 0.9, // Gradiente normal sin teclado
           ),
         ),
         child: SingleChildScrollView(
@@ -107,10 +197,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 100,
                   width: 140,
                 ),
-                SizedBox(height: 40),
+                SizedBox(height: 100),
                 // Título principal de la pantalla
                 Text(
-                  'Log in',
+                  'Iniciar sesión',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 48,
@@ -130,16 +220,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       TextSpan(
                         text: 'Crea una cuenta',
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 19,
                           color: textPrimaryColor,
                           fontWeight: FontWeight.bold,
                           decoration: TextDecoration.underline,
                         ),
                         recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            // Navega a la pantalla de registro
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen()));
-                          },
+                          ..onTap = _navigateToRegister,
                       ),
                     ],
                   ),
@@ -153,14 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   keyboardType: TextInputType.emailAddress,
                   hasValidationError: hasErrorEmail,
                   errorText: errorMessageEmail,
-                  onChanged: (value) {
-                    // Validación de email en tiempo real usando EmailValidation
-                    String? error = EmailValidation.validateEmail(value);
-                    setState(() {
-                      errorMessageEmail = error;
-                      hasErrorEmail = error != null;
-                    });
-                  },
+                  onChanged: _validateEmail,
                 ),
 
                 // Campo de entrada para la contraseña
@@ -168,18 +248,22 @@ class _LoginScreenState extends State<LoginScreen> {
                   inputController: _passwordController,
                   promptText: 'Contraseña',
                   icon: Icons.lock,
-                  hasValidationError: false,
+                  hasValidationError: hasErrorPassword,
+                  errorText: errorMessagePassword,
+                  isPassword: true,
+                  onChanged: _validatePassword,
                 ),
 
                 SizedBox(height: 38),
                 // Botón principal para iniciar sesión
-                BtnBasic(text: 'Crear cuenta'),
+                BtnBasic(
+                  text: 'Iniciar sesión',
+                  onPressed: _handleLogin,
+                ),
                 SizedBox(height: 12),
                 // Botón alternativo para autenticación con Google
                 GoogleButton(
-                  onPressed: () {
-                    // Aquí se implementaría la lógica para el login con Google
-                  },
+                  onPressed: _handleGoogleLogin,
                 ),
                 // Espacio dinámico que se ajusta según la altura del teclado
                 SizedBox(height: MediaQuery.of(context).viewInsets.bottom,),

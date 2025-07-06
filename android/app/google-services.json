@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "703266325047",
+    "firebase_url": "https://devtionary-27741-default-rtdb.firebaseio.com",
+    "project_id": "devtionary-27741",
+    "storage_bucket": "devtionary-27741.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:703266325047:android:d8c337cca8d6ebd836f5b2",
+        "android_client_info": {
+          "package_name": "com.devtionary.devtionary_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "703266325047-m6p744ua58t1762c4tl18c9udbp74pi8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyBjBP1dsfjxc07yFno6oLtAtDp9iWQeQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "703266325047-m6p744ua58t1762c4tl18c9udbp74pi8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
