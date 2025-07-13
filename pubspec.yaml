@@ -18,10 +18,10 @@ dependencies:
   firebase_core: ^2.24.2
   
   # Firebase Auth para autenticación
-  firebase_auth: ^4.15.3
+  firebase_auth: ^4.17.4
   
   # Google Sign In para login con Google
-  google_sign_in: ^6.1.6
+  google_sign_in: ^6.2.1
 
 dev_dependencies:
   flutter_test:

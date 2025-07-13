@@ -10,39 +10,22 @@ class AuthResult {
   final User? user;
   final String? token;
 
-  AuthResult({
-    required this.success,
-    this.error,
-    this.user,
-    this.token,
-  });
+  AuthResult({required this.success, this.error, this.user, this.token});
 
   factory AuthResult.success(User user, String token) {
-    return AuthResult(
-      success: true,
-      user: user,
-      token: token,
-    );
+    return AuthResult(success: true, user: user, token: token);
   }
 
   factory AuthResult.error(String error) {
-    return AuthResult(
-      success: false,
-      error: error,
-    );
+    return AuthResult(success: false, error: error);
   }
 }
 
 /// Estados de carga para las operaciones de autenticación
-enum AuthState {
-  idle,
-  loading,
-  success,
-  error,
-}
+enum AuthState { idle, loading, success, error }
 
 /// Controlador principal para manejar toda la lógica de autenticación
-/// 
+///
 /// Este controller actúa como intermediario entre las pantallas de UI
 /// y los servicios de autenticación (Firebase + Backend)
 class AuthController {
@@ -63,20 +46,18 @@ class AuthController {
   bool get isLoading => _state == AuthState.loading;
   bool get isAuthenticated => _currentUser != null;
 
-  AuthController({
-    AuthService? authService,
-    ApiService? apiService,
-  })  : _authService = authService ?? AuthService(),
-        _apiService = apiService ?? ApiService();
+  AuthController({AuthService? authService, ApiService? apiService})
+    : _authService = authService ?? AuthService(),
+      _apiService = apiService ?? ApiService();
 
   /// Registra un nuevo usuario con email, contraseña y nombre de usuario
-  /// 
+  ///
   /// Flujo:
   /// 1. Valida que el email no esté registrado en Firebase
   /// 2. Crea la cuenta en Firebase
   /// 3. Registra el usuario en el backend
   /// 4. Actualiza el perfil con el nombre de usuario
-  /// 
+  ///
   /// Returns: AuthResult con el resultado de la operación
   Future<AuthResult> registerWithEmail({
     required String email,
@@ -85,7 +66,7 @@ class AuthController {
   }) async {
     try {
       _setState(AuthState.loading);
-      
+
       // 1. Verificar si el usuario ya existe
       final userExists = await checkUserExists(email);
       if (userExists) {
@@ -100,14 +81,23 @@ class AuthController {
       );
 
       if (!firebaseResult.success || firebaseResult.user == null) {
-        _setState(AuthState.error, firebaseResult.error ?? 'Error al crear cuenta');
-        return AuthResult.error(firebaseResult.error ?? 'Error al crear cuenta');
+        _setState(
+          AuthState.error,
+          firebaseResult.error ?? 'Error al crear cuenta',
+        );
+        return AuthResult.error(
+          firebaseResult.error ?? 'Error al crear cuenta',
+        );
       }
 
       // 3. Obtener token de Firebase
-      final token = await firebaseResult.user!.getIdToken();
+      final token = await firebaseResult.user!.getIdToken(true);
+      print('DEBUG TOKEN (registerWithEmail): $token');
       if (token == null || token.isEmpty) {
-        _setState(AuthState.error, 'No se pudo obtener el token de autenticación');
+        _setState(
+          AuthState.error,
+          'No se pudo obtener el token de autenticación',
+        );
         return AuthResult.error('No se pudo obtener el token de autenticación');
       }
 
@@ -121,8 +111,13 @@ class AuthController {
       if (!backendResult.success) {
         // Si falla el backend, eliminar cuenta de Firebase
         await _authService.deleteCurrentUser();
-        _setState(AuthState.error, backendResult.error ?? 'Error al registrar en el servidor');
-        return AuthResult.error(backendResult.error ?? 'Error al registrar en el servidor');
+        _setState(
+          AuthState.error,
+          backendResult.error ?? 'Error al registrar en el servidor',
+        );
+        return AuthResult.error(
+          backendResult.error ?? 'Error al registrar en el servidor',
+        );
       }
 
       // 5. Actualizar perfil de Firebase con username
@@ -134,7 +129,6 @@ class AuthController {
       _setState(AuthState.success);
 
       return AuthResult.success(firebaseResult.user!, token);
-
     } catch (e) {
       _setState(AuthState.error, 'Error inesperado: ${e.toString()}');
       return AuthResult.error('Error inesperado: ${e.toString()}');
@@ -142,35 +136,62 @@ class AuthController {
   }
 
   /// Inicia sesión con Google
-  /// 
+  ///
   /// Flujo:
   /// 1. Autentica con Google a través de Firebase
   /// 2. Verifica si el usuario existe en el backend
   /// 3. Si no existe, lo registra automáticamente
   /// 4. Obtiene el token y configura el estado
-  /// 
+  ///
   /// Returns: AuthResult con el resultado de la operación
   Future<AuthResult> signInWithGoogle() async {
     try {
       _setState(AuthState.loading);
 
+      //////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////
+
+      // Quitar este signOut si no quieres cerrar sesión antes de Google Sign-In
+      await _authService
+          .signOut(); // <-- Quitar si no quieres forzar logout previo
+
+      //////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////
+
       // 1. Autenticar con Google
       final googleResult = await _authService.signInWithGoogle();
 
       if (!googleResult.success || googleResult.user == null) {
-        _setState(AuthState.error, googleResult.error ?? 'Error al iniciar sesión con Google');
-        return AuthResult.error(googleResult.error ?? 'Error al iniciar sesión con Google');
+        _setState(
+          AuthState.error,
+          googleResult.error ?? 'Error al iniciar sesión con Google',
+        );
+        return AuthResult.error(
+          googleResult.error ?? 'Error al iniciar sesión con Google',
+        );
       }
 
       // 2. Obtener token
       final token = await googleResult.user!.getIdToken();
+      print('DEBUG TOKEN (signInWithGoogle): $token');
       if (token == null || token.isEmpty) {
-        _setState(AuthState.error, 'No se pudo obtener el token de autenticación');
+        _setState(
+          AuthState.error,
+          'No se pudo obtener el token de autenticación',
+        );
         return AuthResult.error('No se pudo obtener el token de autenticación');
       }
 
       // 3. Verificar si el usuario existe en el backend
-      final userProfile = await _apiService.getUserProfile(firebaseToken: token);
+      final userProfile = await _apiService.getUserProfile(
+        firebaseToken: token,
+      );
 
       // 4. Si no existe, registrarlo automáticamente
       if (!userProfile.success) {
@@ -192,7 +213,6 @@ class AuthController {
       _setState(AuthState.success);
 
       return AuthResult.success(googleResult.user!, token);
-
     } catch (e) {
       _setState(AuthState.error, 'Error inesperado: ${e.toString()}');
       return AuthResult.error('Error inesperado: ${e.toString()}');
@@ -200,12 +220,12 @@ class AuthController {
   }
 
   /// Inicia sesión con email y contraseña
-  /// 
+  ///
   /// Flujo:
   /// 1. Autentica con Firebase
   /// 2. Obtiene el token
   /// 3. Verifica que el usuario exista en el backend
-  /// 
+  ///
   /// Returns: AuthResult con el resultado de la operación
   Future<AuthResult> signInWithEmail({
     required String email,
@@ -221,19 +241,29 @@ class AuthController {
       );
 
       if (!firebaseResult.success || firebaseResult.user == null) {
-        _setState(AuthState.error, firebaseResult.error ?? 'Credenciales incorrectas');
-        return AuthResult.error(firebaseResult.error ?? 'Credenciales incorrectas');
+        _setState(
+          AuthState.error,
+          firebaseResult.error ?? 'Credenciales incorrectas',
+        );
+        return AuthResult.error(
+          firebaseResult.error ?? 'Credenciales incorrectas',
+        );
       }
 
       // 2. Obtener token
       final token = await firebaseResult.user!.getIdToken();
       if (token == null || token.isEmpty) {
-        _setState(AuthState.error, 'No se pudo obtener el token de autenticación');
+        _setState(
+          AuthState.error,
+          'No se pudo obtener el token de autenticación',
+        );
         return AuthResult.error('No se pudo obtener el token de autenticación');
       }
 
       // 3. Verificar usuario en backend
-      final userProfile = await _apiService.getUserProfile(firebaseToken: token);
+      final userProfile = await _apiService.getUserProfile(
+        firebaseToken: token,
+      );
 
       if (!userProfile.success) {
         _setState(AuthState.error, 'Usuario no encontrado en el servidor');
@@ -246,7 +276,6 @@ class AuthController {
       _setState(AuthState.success);
 
       return AuthResult.success(firebaseResult.user!, token);
-
     } catch (e) {
       _setState(AuthState.error, 'Error inesperado: ${e.toString()}');
       return AuthResult.error('Error inesperado: ${e.toString()}');
@@ -254,7 +283,7 @@ class AuthController {
   }
 
   /// Verifica si un usuario existe en Firebase
-  /// 
+  ///
   /// Returns: true si el usuario existe, false si no
   Future<bool> checkUserExists(String email) async {
     try {
@@ -266,7 +295,7 @@ class AuthController {
   }
 
   /// Cierra la sesión actual
-  /// 
+  ///
   /// Limpia tanto Firebase como el estado local
   Future<void> signOut() async {
     try {
@@ -280,7 +309,7 @@ class AuthController {
   }
 
   /// Envía un email de recuperación de contraseña
-  /// 
+  ///
   /// Returns: AuthResult con el resultado de la operación
   Future<AuthResult> sendPasswordResetEmail(String email) async {
     try {
@@ -302,8 +331,8 @@ class AuthController {
     }
   }
 
-  /// Actualiza el perfil del usuario actual
-  /// 
+  /// Actualiza el perfil del usuario current
+  ///
   /// Returns: AuthResult con el resultado de la operación
   Future<AuthResult> updateProfile({
     String? displayName,
@@ -322,7 +351,10 @@ class AuthController {
         _setState(AuthState.success);
         return AuthResult.success(result.user!, _currentToken ?? '');
       } else {
-        _setState(AuthState.error, result.error ?? 'Error al actualizar perfil');
+        _setState(
+          AuthState.error,
+          result.error ?? 'Error al actualizar perfil',
+        );
         return AuthResult.error(result.error ?? 'Error al actualizar perfil');
       }
     } catch (e) {
@@ -332,7 +364,7 @@ class AuthController {
   }
 
   /// Refresca el token actual de Firebase
-  /// 
+  ///
   /// Returns: El nuevo token o null si hay error
   Future<String?> refreshToken() async {
     try {
@@ -348,12 +380,12 @@ class AuthController {
   }
 
   /// Inicializa el controller verificando si hay un usuario autenticado
-  /// 
+  ///
   /// Debe llamarse al iniciar la aplicación
   Future<void> initialize() async {
     try {
       _setState(AuthState.loading);
-      
+
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         final token = await user.getIdToken();
@@ -389,13 +421,13 @@ class AuthController {
   /// Verifica si el token actual es válido
   bool isTokenValid() {
     if (_currentUser == null || _currentToken == null) return false;
-    
+
     try {
       // Verificar si el token no ha expirado
       // Los tokens de Firebase duran 1 hora
       final tokenParts = _currentToken!.split('.');
       if (tokenParts.length != 3) return false;
-      
+
       // Aquí podrías decodificar el JWT y verificar la fecha de expiración
       // Por simplicidad, asumimos que es válido si existe
       return true;

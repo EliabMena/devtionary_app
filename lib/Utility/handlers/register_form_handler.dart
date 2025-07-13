@@ -1,3 +1,6 @@
+import 'package:devtionary_app/services/api_service.dart';
+import 'package:devtionary_app/services/auth_service.dart';
+
 import '../controllers/auth_controller.dart';
 import '../validations/email_vlitations.dart';
 import '../validations/username_validations.dart';
@@ -13,6 +16,8 @@ import '../helpers/form_helper.dart';
  */
 class RegisterFormHandler {
   final AuthController _authController = AuthController();
+  final ApiService apiService = ApiService();
+  final AuthService _authService = AuthService();
 
   // Valida el email y retorna el mensaje de error si existe
   String? validateEmail(String email) {
@@ -54,10 +59,25 @@ class RegisterFormHandler {
       );
 
       if (result.success) {
-        return RegisterResult(
-          success: true,
-          message: '¡Registro exitoso! Bienvenido a Devtionary',
+        // Guardar usuario en el backend solo si el registro en Firebase Auth fue exitoso
+        final firebaseToken = await _authService.getCurrentToken();
+        final backendResult = await apiService.registerUser(
+          email: email.trim(),
+          username: username.trim(),
+          firebaseToken: firebaseToken ?? '',
         );
+
+        if (backendResult.success) {
+          return RegisterResult(
+            success: true,
+            message: '¡Registro exitoso! Bienvenido a Devtionary',
+          );
+        } else {
+          return RegisterResult(
+            success: false,
+            message: backendResult.error ?? 'Error al guardar en el backend',
+          );
+        }
       } else {
         return RegisterResult(
           success: false,
@@ -65,10 +85,7 @@ class RegisterFormHandler {
         );
       }
     } catch (e) {
-      return RegisterResult(
-        success: false,
-        message: 'Error inesperado: $e',
-      );
+      return RegisterResult(success: false, message: 'Error inesperado: $e');
     }
   }
 
@@ -146,10 +163,7 @@ class RegisterResult {
   final bool success;
   final String message;
 
-  RegisterResult({
-    required this.success,
-    required this.message,
-  });
+  RegisterResult({required this.success, required this.message});
 }
 
 /*
@@ -160,8 +174,5 @@ class ValidationResult {
   final bool isValid;
   final Map<String, String?> errors;
 
-  ValidationResult({
-    required this.isValid,
-    required this.errors,
-  });
+  ValidationResult({required this.isValid, required this.errors});
 }

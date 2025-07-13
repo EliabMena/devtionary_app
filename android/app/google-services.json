@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "703266325047-ekjucmvn327djmk4kkl123s4dvp7b4sc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.devtionary.devtionary_app",
+            "certificate_hash": "cd022c2519378aba8f7f5b2f896ea862902e71ff"
+          }
+        },
+        {
           "client_id": "703266325047-m6p744ua58t1762c4tl18c9udbp74pi8.apps.googleusercontent.com",
           "client_type": 3
         }

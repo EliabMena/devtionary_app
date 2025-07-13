@@ -4,19 +4,19 @@ import 'auth_service.dart';
 import '../models/service_result.dart';
 
 class ApiService {
-  
   // URL para las solicitudes a la API
   //Por el momento, se usa localhost para pruebas
-  static const String _baseUrl = 'http://localhost:8080';
-  
+  static const String _baseUrl =
+      'https://devtionary-api-production.up.railway.app';
+
   // Instancia del AuthService para obtener tokens
   final AuthService _authService = AuthService();
-  
+
   // Timeout para peticiones HTTP (30 segundos)
-  static const Duration _timeout = Duration(seconds: 30);
-  
+  static const Duration _timeout = Duration(seconds: 50);
+
   // HEADERS Y UTILIDADES
-    
+
   // Obtiene headers con token de autorización
   Future<Map<String, String>?> _getHeaders() async {
     try {
@@ -40,7 +40,7 @@ class ApiService {
   Map<String, String> _getHeadersWithToken(String token) {
     return {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer ${token.trim()}',
     };
   }
 
@@ -55,17 +55,16 @@ class ApiService {
       Map<String, String> headers = _getHeadersWithToken(firebaseToken);
 
       // Preparar body de la petición
-      Map<String, dynamic> body = {
-        'email': email,
-        'username': username,
-      };
+      Map<String, dynamic> body = {'email': email, 'username': username};
 
       // Hacer petición POST
-      http.Response response = await http.post(
-        Uri.parse('$_baseUrl/api/user/register'),
-        headers: headers,
-        body: json.encode(body),
-      ).timeout(_timeout);
+      http.Response response = await http
+          .post(
+            Uri.parse('$_baseUrl/api/user/create'),
+            headers: headers,
+            body: json.encode(body),
+          )
+          .timeout(_timeout);
 
       // Verificar código de estado
       if (response.statusCode == 201) {
@@ -77,7 +76,9 @@ class ApiService {
         return ServiceResult.error('Ya existe un usuario con este email');
       } else {
         _handleHttpError(response, 'registerUser');
-        return ServiceResult.error('Error del servidor: ${response.statusCode}');
+        return ServiceResult.error(
+          'Error del servidor: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print('Error en registerUser: $e');
@@ -94,10 +95,9 @@ class ApiService {
       Map<String, String> headers = _getHeadersWithToken(firebaseToken);
 
       // Hacer petición GET
-      http.Response response = await http.get(
-        Uri.parse('$_baseUrl/api/user/profile'),
-        headers: headers,
-      ).timeout(_timeout);
+      http.Response response = await http
+          .get(Uri.parse('$_baseUrl/api/user/profile'), headers: headers)
+          .timeout(_timeout);
 
       // Verificar código de estado
       if (response.statusCode == 200) {
@@ -107,7 +107,9 @@ class ApiService {
         return ServiceResult.error('Perfil de usuario no encontrado');
       } else {
         _handleHttpError(response, 'getUserProfile');
-        return ServiceResult.error('Error del servidor: ${response.statusCode}');
+        return ServiceResult.error(
+          'Error del servidor: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print('Error en getUserProfile: $e');
@@ -148,10 +150,9 @@ class ApiService {
       }
 
       // Hacer petición GET
-      http.Response response = await http.get(
-        Uri.parse('$_baseUrl/api/user/exists'),
-        headers: headers,
-      ).timeout(_timeout);
+      http.Response response = await http
+          .get(Uri.parse('$_baseUrl/api/user/exists'), headers: headers)
+          .timeout(_timeout);
 
       // Verificar código de estado
       if (response.statusCode == 200) {
@@ -175,7 +176,7 @@ class ApiService {
       if (headers == null) {
         return {
           'success': false,
-          'error': 'No se pudo obtener token de autenticación'
+          'error': 'No se pudo obtener token de autenticación',
         };
       }
 
@@ -186,11 +187,13 @@ class ApiService {
       }
 
       // Hacer petición POST
-      http.Response response = await http.post(
-        Uri.parse('$_baseUrl/api/user/create'),
-        headers: headers,
-        body: json.encode(body),
-      ).timeout(_timeout);
+      http.Response response = await http
+          .post(
+            Uri.parse('$_baseUrl/api/user/create'),
+            headers: headers,
+            body: json.encode(body),
+          )
+          .timeout(_timeout);
 
       // Verificar código de estado
       if (response.statusCode == 201) {
@@ -198,27 +201,24 @@ class ApiService {
         return {
           'success': true,
           'message': response.body,
-          'data': response.body
+          'data': response.body,
         };
       } else if (response.statusCode == 409) {
         // Usuario ya existe
         return {
           'success': false,
-          'error': 'Ya existe un perfil para este usuario'
+          'error': 'Ya existe un perfil para este usuario',
         };
       } else {
         _handleHttpError(response, 'createUserProfile');
         return {
           'success': false,
-          'error': 'Error del servidor: ${response.statusCode}'
+          'error': 'Error del servidor: ${response.statusCode}',
         };
       }
     } catch (e) {
       print('Error en createUserProfile: $e');
-      return {
-        'success': false,
-        'error': 'Error de conexión: $e'
-      };
+      return {'success': false, 'error': 'Error de conexión: $e'};
     }
   }
 
@@ -230,41 +230,31 @@ class ApiService {
       if (headers == null) {
         return {
           'success': false,
-          'error': 'No se pudo obtener token de autenticación'
+          'error': 'No se pudo obtener token de autenticación',
         };
       }
 
       // Hacer petición GET
-      http.Response response = await http.get(
-        Uri.parse('$_baseUrl/api/user/profile'),
-        headers: headers,
-      ).timeout(_timeout);
+      http.Response response = await http
+          .get(Uri.parse('$_baseUrl/api/user/profile'), headers: headers)
+          .timeout(_timeout);
 
       // Verificar código de estado
       if (response.statusCode == 200) {
         Map<String, dynamic> userData = json.decode(response.body);
-        return {
-          'success': true,
-          'data': userData
-        };
+        return {'success': true, 'data': userData};
       } else if (response.statusCode == 404) {
-        return {
-          'success': false,
-          'error': 'Perfil de usuario no encontrado'
-        };
+        return {'success': false, 'error': 'Perfil de usuario no encontrado'};
       } else {
         _handleHttpError(response, 'getUserProfile');
         return {
           'success': false,
-          'error': 'Error del servidor: ${response.statusCode}'
+          'error': 'Error del servidor: ${response.statusCode}',
         };
       }
     } catch (e) {
       print('Error en getUserProfile: $e');
-      return {
-        'success': false,
-        'error': 'Error de conexión: $e'
-      };
+      return {'success': false, 'error': 'Error de conexión: $e'};
     }
   }
 
@@ -272,12 +262,12 @@ class ApiService {
   Future<bool> checkApiHealth() async {
     try {
       // Hacer petición GET sin autenticación
-      http.Response response = await http.get(
-        Uri.parse('$_baseUrl/api/user/health'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      ).timeout(_timeout);
+      http.Response response = await http
+          .get(
+            Uri.parse('$_baseUrl/api/user/health'),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(_timeout);
 
       // Verificar código de estado
       if (response.statusCode == 200) {
@@ -295,7 +285,8 @@ class ApiService {
 
   // Refresca el token y reintenta una petición fallida
   Future<Map<String, dynamic>> _retryWithRefreshToken(
-      Future<Map<String, dynamic>> Function() apiCall) async {
+    Future<Map<String, dynamic>> Function() apiCall,
+  ) async {
     try {
       // Intentar refrescar token
       String? newToken = await _authService.refreshToken();
@@ -303,16 +294,10 @@ class ApiService {
         // Reintentar la petición original
         return await apiCall();
       } else {
-        return {
-          'success': false,
-          'error': 'No se pudo refrescar el token'
-        };
+        return {'success': false, 'error': 'No se pudo refrescar el token'};
       }
     } catch (e) {
-      return {
-        'success': false,
-        'error': 'Error refrescando token: $e'
-      };
+      return {'success': false, 'error': 'Error refrescando token: $e'};
     }
   }
 
@@ -321,9 +306,9 @@ class ApiService {
   Future<Map<String, dynamic>> getApiStatus() async {
     try {
       DateTime startTime = DateTime.now();
-      
+
       bool isHealthy = await checkApiHealth();
-      
+
       DateTime endTime = DateTime.now();
       int responseTime = endTime.difference(startTime).inMilliseconds;
 
@@ -331,14 +316,14 @@ class ApiService {
         'isHealthy': isHealthy,
         'responseTime': responseTime,
         'timestamp': DateTime.now().toIso8601String(),
-        'baseUrl': _baseUrl
+        'baseUrl': _baseUrl,
       };
     } catch (e) {
       return {
         'isHealthy': false,
         'error': e.toString(),
         'timestamp': DateTime.now().toIso8601String(),
-        'baseUrl': _baseUrl
+        'baseUrl': _baseUrl,
       };
     }
   }

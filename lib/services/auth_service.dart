@@ -3,7 +3,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../models/service_result.dart';
 
 class AuthService {
-  
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   // Instancia singleton de Google Sign-In
@@ -18,13 +17,13 @@ class AuthService {
     try {
       // Crear usuario en Firebase Auth
       UserCredential userCredential = await _firebaseAuth
-          .createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+          .createUserWithEmailAndPassword(email: email, password: password);
 
       // Retornar resultado exitoso
-      return ServiceResult.success(userCredential.user!, user: userCredential.user);
+      return ServiceResult.success(
+        userCredential.user!,
+        user: userCredential.user,
+      );
     } on FirebaseAuthException catch (e) {
       // Manejar errores específicos de Firebase Auth
       String errorMessage = _getFirebaseErrorMessage(e.code);
@@ -43,15 +42,17 @@ class AuthService {
     required String password,
   }) async {
     try {
+      // Limpiar email antes de login
+      final emailClean = email.trim();
       // Autenticar con Firebase Auth
       UserCredential userCredential = await _firebaseAuth
-          .signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+          .signInWithEmailAndPassword(email: emailClean, password: password);
 
       // Retornar resultado exitoso
-      return ServiceResult.success(userCredential.user!, user: userCredential.user);
+      return ServiceResult.success(
+        userCredential.user!,
+        user: userCredential.user,
+      );
     } on FirebaseAuthException catch (e) {
       // Manejar errores específicos de Firebase Auth
       String errorMessage = _getFirebaseErrorMessage(e.code);
@@ -69,14 +70,14 @@ class AuthService {
     try {
       // Paso 1: Iniciar flujo de Google Sign-In
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      
+
       // Usuario canceló el flujo
       if (googleUser == null) {
         return ServiceResult.error('El usuario canceló el inicio de sesión');
       }
 
       // Paso 2: Obtener credenciales de autenticación
-      final GoogleSignInAuthentication googleAuth = 
+      final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
       // Paso 3: Crear credenciales de Firebase
@@ -86,11 +87,15 @@ class AuthService {
       );
 
       // Paso 4: Autenticar con Firebase usando credenciales de Google
-      UserCredential userCredential = await _firebaseAuth
-          .signInWithCredential(credential);
+      UserCredential userCredential = await _firebaseAuth.signInWithCredential(
+        credential,
+      );
 
       // Retornar resultado exitoso
-      return ServiceResult.success(userCredential.user!, user: userCredential.user);
+      return ServiceResult.success(
+        userCredential.user!,
+        user: userCredential.user,
+      );
     } on FirebaseAuthException catch (e) {
       // Manejar errores específicos de Firebase Auth
       String errorMessage = _getFirebaseErrorMessage(e.code);
@@ -99,7 +104,9 @@ class AuthService {
     } catch (e) {
       // Manejar otros errores
       print('Error inesperado en Google Sign-In: $e');
-      return ServiceResult.error('Error inesperado en el inicio de sesión con Google');
+      return ServiceResult.error(
+        'Error inesperado en el inicio de sesión con Google',
+      );
     }
   }
 
@@ -120,7 +127,9 @@ class AuthService {
       return ServiceResult.success(null);
     } on FirebaseAuthException catch (e) {
       String errorMessage = _getFirebaseErrorMessage(e.code);
-      print('Error enviando email de restablecimiento: ${e.code} - ${e.message}');
+      print(
+        'Error enviando email de restablecimiento: ${e.code} - ${e.message}',
+      );
       return ServiceResult.error(errorMessage);
     } catch (e) {
       print('Error inesperado enviando email: $e');
@@ -143,10 +152,10 @@ class AuthService {
       if (photoURL != null) {
         await user.updatePhotoURL(photoURL);
       }
-      
+
       await user.reload();
       User? updatedUser = _firebaseAuth.currentUser;
-      
+
       return ServiceResult.success(updatedUser!, user: updatedUser);
     } on FirebaseAuthException catch (e) {
       String errorMessage = _getFirebaseErrorMessage(e.code);
@@ -226,10 +235,10 @@ class AuthService {
     try {
       // Cerrar sesión en Firebase Auth
       await _firebaseAuth.signOut();
-      
+
       // Cerrar sesión en Google Sign-In (si se usó)
       await _googleSignIn.signOut();
-      
+
       print('Sesión cerrada exitosamente');
     } catch (e) {
       print('Error cerrando sesión: $e');

@@ -4,6 +4,7 @@ import 'package:devtionary_app/screens/register_screen.dart';
 import 'package:devtionary_app/widgets/btn_basic.dart';
 import 'package:devtionary_app/widgets/btn_google.dart';
 import 'package:devtionary_app/widgets/text_input.dart';
+import 'package:devtionary_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 
@@ -83,16 +84,11 @@ class _LoginScreenState extends State<LoginScreen> {
   void _showMessage(String message, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: TextStyle(color: Colors.white),
-        ),
+        content: Text(message, style: TextStyle(color: Colors.white)),
         backgroundColor: isError ? Colors.red : Colors.green,
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
@@ -107,25 +103,67 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // Manejar el inicio de sesión con email y contraseña
   Future<void> _handleLogin() async {
+    ////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+    // Forzar logout antes de login esto se tiene que quitar y remplazar por un
+    //boton de logout
+    await AuthService().signOut();
+    ///////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
+
     // Validar todos los campos
     _validateEmail(_emailController.text);
     _validatePassword(_passwordController.text);
 
     if (!_areAllFieldsValid()) {
-      _showMessage('Por favor, corrige los errores antes de continuar', isError: true);
+      _showMessage(
+        'Por favor, corrige los errores antes de continuar',
+        isError: true,
+      );
       return;
     }
 
-    // TODO: Implementar lógica de autenticación con backend
-    _showMessage('Funcionalidad de login en desarrollo');
-    print('Login attempt with email: ${_emailController.text}');
+    // Implementar lógica de autenticación con AuthService
+    final authService = AuthService();
+    final result = await authService.signInWithEmail(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
+
+    if (result.success) {
+      _showMessage('¡Inicio de sesión exitoso!');
+      // Aquí puedes navegar a la pantalla principal
+      // Navigator.pushReplacement(...)
+    } else {
+      _showMessage(
+        result.error ?? 'Error en el inicio de sesión',
+        isError: true,
+      );
+    }
   }
 
   // Manejar el inicio de sesión con Google
   Future<void> _handleGoogleLogin() async {
-    // TODO: Implementar lógica de autenticación con Google
-    _showMessage('Funcionalidad de Google login en desarrollo');
-    print('Google login attempt');
+    ////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+    // Forzar logout antes de login esto se tiene que quitar y remplazar por un
+    //boton de logout
+    await AuthService().signOut();
+    ///////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
+
+    final authService = AuthService();
+    final result = await authService.signInWithGoogle();
+
+    if (result.success) {
+      _showMessage('¡Inicio de sesión exitoso!');
+      // Aquí puedes navegar a la pantalla principal o dashboard
+    } else {
+      _showMessage(
+        result.error ?? 'Error en el inicio de sesión con Google',
+        isError: true,
+      );
+    }
   }
 
   /*
@@ -175,8 +213,16 @@ class _LoginScreenState extends State<LoginScreen> {
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
           gradient: RadialGradient(
-            colors: [primaryGradientColor, secondaryGradientColor, Colors.black],
-            stops: [0.2, 0.4, 0.7], // Ajuste de donde Inicia el degradado y termina
+            colors: [
+              primaryGradientColor,
+              secondaryGradientColor,
+              Colors.black,
+            ],
+            stops: [
+              0.2,
+              0.4,
+              0.7,
+            ], // Ajuste de donde Inicia el degradado y termina
             center: Alignment.bottomCenter,
             radius: MediaQuery.of(context).viewInsets.bottom > 0
                 ? 1.5 // Gradiente más grande cuando hay teclado
@@ -187,7 +233,8 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Padding(
             padding: const EdgeInsets.all(25.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // Alinea a la izquierda
+              crossAxisAlignment:
+                  CrossAxisAlignment.start, // Alinea a la izquierda
               children: [
                 Align(alignment: Alignment.topLeft),
                 SizedBox(height: 0),
@@ -211,10 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Texto con enlace para navegar a la pantalla de registro
                 RichText(
                   text: TextSpan(
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 18),
                     children: [
                       TextSpan(text: 'Usuario nuevo? '),
                       TextSpan(
@@ -256,17 +300,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 SizedBox(height: 38),
                 // Botón principal para iniciar sesión
-                BtnBasic(
-                  text: 'Iniciar sesión',
-                  onPressed: _handleLogin,
-                ),
+                BtnBasic(text: 'Iniciar sesión', onPressed: _handleLogin),
                 SizedBox(height: 12),
                 // Botón alternativo para autenticación con Google
-                GoogleButton(
-                  onPressed: _handleGoogleLogin,
-                ),
+                GoogleButton(onPressed: _handleGoogleLogin),
                 // Espacio dinámico que se ajusta según la altura del teclado
-                SizedBox(height: MediaQuery.of(context).viewInsets.bottom,),
+                SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
               ],
             ),
           ),
