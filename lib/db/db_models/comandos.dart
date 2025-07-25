@@ -1,4 +1,4 @@
-class Comandos{
+class Comandos {
   final int id_comando;
   final int id_subcategoria;
   final String nombre_comando;
@@ -21,20 +21,20 @@ class Comandos{
     required this.fecha_creacion,
     required this.fecha_actualizacion,
   });
-  factory Comandos.fromMap(Map<String, dynamic> map) {
+  factory Comandos.fromJson(Map<String, dynamic> json) {
     return Comandos(
-      id_comando: map['id_comando'] as int,
-      id_subcategoria: map['id_subcategoria'] as int,
-      nombre_comando: map['nombre_comando'] as String,
-      descripcion: map['descripcion'] as String,
-      ejemplo: map['ejemplo'] as String,
-      ejemplo_2: map['ejemplo_2'] as String?,
-      ejemplo_3: map['ejemplo_3'] as String?,
-      fecha_creacion: map['fecha_creacion'] as String,
-      fecha_actualizacion: map['fecha_actualizacion'] as String,
+      id_comando: json['id_comando'] as int,
+      id_subcategoria: json['id_subcategoria'] as int,
+      nombre_comando: json['nombre_comando'] as String,
+      descripcion: json['descripcion'] as String,
+      ejemplo: json['ejemplo'] as String,
+      ejemplo_2: json['ejemplo_2'] as String?,
+      ejemplo_3: json['ejemplo_3'] as String?,
+      fecha_creacion: json['fecha_creacion'] as String,
+      fecha_actualizacion: json['fecha_actualizacion'] as String,
     );
   }
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'id_comando': id_comando,
       'id_subcategoria': id_subcategoria,

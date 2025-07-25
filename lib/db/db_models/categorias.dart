@@ -1,28 +1,28 @@
-class Categorias{
-  final int idCategoria;
+class Categorias {
+  final int id_categoria;
   final String nombre;
   final String fechaCreacion;
   final String fechaActualizacion;
 
   // Método Constructor
   const Categorias({
-    required this.idCategoria,
+    required this.id_categoria,
     required this.nombre,
     required this.fechaCreacion,
     required this.fechaActualizacion,
   });
 
-  factory Categorias.fromMap(Map<String, dynamic> map) {
+  factory Categorias.fromJson(Map<String, dynamic> json) {
     return Categorias(
-      idCategoria: map['id_categoria'] as int,
-      nombre: map['nombre'] as String,
-      fechaCreacion: map['fecha_creacion'] as String,
-      fechaActualizacion: map['fecha_actualizacion'] as String,
+      id_categoria: json['id_categoria'] as int,
+      nombre: json['nombre'] as String,
+      fechaCreacion: json['fecha_creacion'] as String,
+      fechaActualizacion: json['fecha_actualizacion'] as String,
     );
   }
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
-      'id_categoria': idCategoria,
+      'id_categoria': id_categoria,
       'nombre': nombre,
       'fecha_creacion': fechaCreacion,
       'fecha_actualizacion': fechaActualizacion,

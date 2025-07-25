@@ -1,4 +1,4 @@
-class Terminos{
+class Terminos {
   final int id_termino;
   final int id_subcategoria;
   final String nombre_termino;
@@ -18,19 +18,19 @@ class Terminos{
     required this.fecha_actualizacion,
   });
 
-  factory Terminos.fromMap(Map<String, dynamic> map) {
+  factory Terminos.fromJson(Map<String, dynamic> json) {
     return Terminos(
-      id_termino: map['id_termino'] as int,
-      id_subcategoria: map['id_subcategoria'] as int,
-      nombre_termino: map['nombre_termino'] as String,
-      descripcion: map['descripcion'] as String,
-      ejemplo: map['ejemplo'] as String,
-      fecha_creacion: map['fecha_creacion'] as String,
-      fecha_actualizacion: map['fecha_actualizacion'] as String,
+      id_termino: json['id_termino'] as int,
+      id_subcategoria: json['id_subcategoria'] as int,
+      nombre_termino: json['nombre_termino'] as String,
+      descripcion: json['descripcion'] as String,
+      ejemplo: json['ejemplo'] as String,
+      fecha_creacion: json['fecha_creacion'] as String,
+      fecha_actualizacion: json['fecha_actualizacion'] as String,
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'id_termino': id_termino,
       'id_subcategoria': id_subcategoria,

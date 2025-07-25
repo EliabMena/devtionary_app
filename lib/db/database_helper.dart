@@ -14,6 +14,7 @@ class DatabaseHelper {
     _database = await _initDB('base_datos.db');
     return _database!;
   }
+
   // Crear la base de datos
   static Future<Database> _initDB(String fileName) async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
@@ -21,13 +22,14 @@ class DatabaseHelper {
 
     return await openDatabase(path, version: 1, onCreate: _createDB);
   }
-  // Crear tabla
+
+  // Crear las tablas
   static Future _createDB(Database db, int version) async {
     await db.transaction((txn) async {
       //Crear la tabla de categorías
       await txn.execute('''
         CREATE TABLE IF NOT EXISTS categorias (
-          id_categoria INTEGER PRIMARY KEY AUTOINCREMENT,
+          id_categoria INTEGER PRIMARY KEY,
           nombre TEXT NOT NULL,
           fecha_creacion TEXT NOT NULL,
           fecha_actualizacion TEXT NOT NULL,
@@ -36,7 +38,7 @@ class DatabaseHelper {
       //Crear la tabla de subcategorías
       await txn.execute('''
         CREATE TABLE IF NOT EXISTS subcategorias(
-          id_subcategoria INTEGER PRIMARY KEY AUTOINCREMENT,
+          id_subcategoria INTEGER PRIMARY KEY,
           id_categoria INTEGER,
           nombre TEXT NOT NULL,
           fecha_creacion TEXT,
@@ -46,21 +48,21 @@ class DatabaseHelper {
         ''');
       //Crear la tabla de términos
       await txn.execute('''
-      CREATE TABLE IF NOT EXISTS terminos ()
-          id_termino INTEGER PRIMARY KEY AUTOINCREMENT,
+      CREATE TABLE IF NOT EXISTS terminos (
+          id_termino INTEGER PRIMARY KEY,
           id_subcategoria INTEGER,
           nombre_termino TEXT NOT NULL,
           descripcion REAL NOT NULL,
           ejemplo INTEGER NOT NULL,
           fecha_creacion TEXT NOT NULL,
           fecha_actualizacion TEXT NOT NULL,
-          FOREIGN KEY (id_subcategoria) REFERENCES subcategorias(id_subcategoria
-        )
+          FOREIGN KEY (id_subcategoria) REFERENCES subcategorias(id_subcategoria)
+          )
       ''');
       //Crear la tabla de comandos
       await txn.execute('''
         CREATE TABLE IF NOT EXISTS comandos (
-          id_comando INTEGER PRIMARY KEY AUTOINCREMENT,
+          id_comando INTEGER PRIMARY KEY,
           id_subcategoria INTEGER,
           nombre_comando TEXT NOT NULL,
           descripcion TEXT NOT NULL,
@@ -70,11 +72,12 @@ class DatabaseHelper {
           fecha_creacion TEXT NOT NULL,
           fecha_actualizacion TEXT NOT NULL,
           FOREIGN KEY (id_subcategoria) REFERENCES subcategorias(id_subcategoria)
-      )''');
+          )
+        ''');
       //Crear la tabla de instrucciones
       await txn.execute('''
         CREATE TABLE IF NOT EXISTS instrucciones (
-          id_instruccion INTEGER PRIMARY KEY AUTOINCREMENT,
+          id_instruccion INTEGER PRIMARY KEY,
           id_subcategoria INTEGER,
           nombre_instruccion TEXT NOT NULL,
           descripcion TEXT NOT NULL,
@@ -82,8 +85,8 @@ class DatabaseHelper {
           fecha_creacion TEXT NOT NULL,
           fecha_actualizacion TEXT NOT NULL,
           FOREIGN KEY (id_subcategoria) REFERENCES subcategorias(id_subcategoria)
-      )''');
+          )
+      ''');
     });
   }
-
-  }
+}

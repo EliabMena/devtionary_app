@@ -1,4 +1,4 @@
-class Instrucciones{
+class Instrucciones {
   final int id_instruccion;
   final int id_subcategoria;
   final String nombre_instruccion;
@@ -18,19 +18,19 @@ class Instrucciones{
     required this.fecha_actualizacion,
   });
 
-  factory Instrucciones.fromMap(Map<String, dynamic> map) {
+  factory Instrucciones.fromJson(Map<String, dynamic> json) {
     return Instrucciones(
-      id_instruccion: map['id_instruccion'] as int,
-      id_subcategoria: map['id_subcategoria'] as int,
-      nombre_instruccion: map['nombre_instruccion'] as String,
-      descripcion: map['descripcion'] as String,
-      ejemplo: map['ejemplo'] as String,
-      fecha_creacion: map['fecha_creacion'] as String,
-      fecha_actualizacion: map['fecha_actualizacion'] as String,
+      id_instruccion: json['id_instruccion'] as int,
+      id_subcategoria: json['id_subcategoria'] as int,
+      nombre_instruccion: json['nombre_instruccion'] as String,
+      descripcion: json['descripcion'] as String,
+      ejemplo: json['ejemplo'] as String,
+      fecha_creacion: json['fecha_creacion'] as String,
+      fecha_actualizacion: json['fecha_actualizacion'] as String,
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'id_instruccion': id_instruccion,
       'id_subcategoria': id_subcategoria,
