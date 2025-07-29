@@ -57,27 +57,12 @@ class RegisterFormHandler {
         password: password,
         username: username.trim(),
       );
-
+      // Solo retorna el resultado del AuthController, que ya maneja el registro en backend
       if (result.success) {
-        // Guardar usuario en el backend solo si el registro en Firebase Auth fue exitoso
-        final firebaseToken = await _authService.getCurrentToken();
-        final backendResult = await apiService.registerUser(
-          email: email.trim(),
-          username: username.trim(),
-          firebaseToken: firebaseToken ?? '',
+        return RegisterResult(
+          success: true,
+          message: '¡Registro exitoso! Bienvenido a Devtionary',
         );
-
-        if (backendResult.success) {
-          return RegisterResult(
-            success: true,
-            message: '¡Registro exitoso! Bienvenido a Devtionary',
-          );
-        } else {
-          return RegisterResult(
-            success: false,
-            message: backendResult.error ?? 'Error al guardar en el backend',
-          );
-        }
       } else {
         return RegisterResult(
           success: false,

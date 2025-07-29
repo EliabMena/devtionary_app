@@ -88,7 +88,7 @@ class RegisterCoordinator {
 
       if (result.success) {
         // TODO: Navegar a la pantalla principal cuando esté lista
-        // Navigator.pushReplacementNamed(_context, '/main');
+        Navigator.pushReplacementNamed(_context, '/targetas');
       }
     } finally {
       _uiStateManager.setLoading(false);
@@ -133,11 +133,7 @@ class RegisterCoordinator {
   }) {
     return _formHandler.areAllFieldsValid(
       hasErrors: _uiStateManager.getErrorStates(),
-      fieldValues: {
-        'email': email,
-        'password': password,
-        'username': username,
-      },
+      fieldValues: {'email': email, 'password': password, 'username': username},
     );
   }
 

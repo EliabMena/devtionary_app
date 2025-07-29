@@ -1,7 +1,7 @@
 import 'package:devtionary_app/Utility/thems/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:devtionary_app/widgets/nav_button.dart';
-import 'package:devtionary_app/widgets/search_bar.dart';
+import 'package:devtionary_app/widgets/searchbar.dart';
 
 class WordCardsScreen extends StatefulWidget {
   @override
