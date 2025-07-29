@@ -129,6 +129,72 @@ class ComandosRepository {
     );
   }
 
+  Future<List<Comandos>> getComandos() async {
+    final db = await DatabaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query('comandos');
+
+    return List.generate(maps.length, (i) {
+      return Comandos.fromJson(maps[i]);
+    });
+  }
+
+  // Método para obtener comandos por nombre de subcategoría
+  Future<List<Comandos>> getComandosPorSubcategoria(
+    String nombreSubcategoria,
+  ) async {
+    final db = await DatabaseHelper.database;
+
+    // Realizar JOIN entre las tablas comandos y subcategorias
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      '''
+      SELECT c.* 
+      FROM comandos c
+      INNER JOIN subcategorias s ON c.id_subcategoria = s.id_subcategoria
+      WHERE s.nombre = ?
+      ORDER BY c.nombre_comando ASC
+    ''',
+      [nombreSubcategoria],
+    );
+
+    return List.generate(maps.length, (i) {
+      return Comandos.fromJson(maps[i]);
+    });
+  }
+
+  // Método para buscar comandos por nombre (búsqueda parcial)
+  Future<List<Comandos>> buscarComandosPorNombre(String nombre) async {
+    final db = await DatabaseHelper.database;
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      'comandos',
+      where: 'nombre_comando LIKE ?',
+      whereArgs: ['%$nombre%'],
+      orderBy: 'nombre_comando ASC',
+    );
+
+    return List.generate(maps.length, (i) {
+      return Comandos.fromJson(maps[i]);
+    });
+  }
+
+  // Método para buscar comandos por palabras en la descripción
+  Future<List<Comandos>> buscarComandosPorDescripcion(
+    String palabraClave,
+  ) async {
+    final db = await DatabaseHelper.database;
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      'comandos',
+      where: 'descripcion LIKE ?',
+      whereArgs: ['%$palabraClave%'],
+      orderBy: 'nombre_comando ASC',
+    );
+
+    return List.generate(maps.length, (i) {
+      return Comandos.fromJson(maps[i]);
+    });
+  }
+
   String _getErrorMessage(int statusCode) {
     switch (statusCode) {
       case 401:
