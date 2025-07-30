@@ -1,3 +1,7 @@
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:devtionary_app/db/repositorios/terminos_repository.dart';
 import 'package:devtionary_app/Utility/thems/app_colors.dart';
 import 'package:devtionary_app/Utility/coordinators/register_coordinator.dart';
 import 'package:devtionary_app/Utility/helpers/scroll_helper.dart';
@@ -102,6 +106,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: _passwordController.text,
         username: _usernameController.text,
       );
+      // Verificar versión de API y sincronizar si es nueva
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final response = await http.get(
+          Uri.parse(
+            'https://devtionary-api-production.up.railway.app/api/user/health',
+          ),
+        );
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          final apiVersion = data['version'] ?? '';
+          final localVersion = prefs.getString('api_version') ?? '';
+          if (apiVersion != localVersion) {
+            await TerminosRepository().sincronizarTerminos();
+            await prefs.setString('api_version', apiVersion);
+            print('Sincronización realizada por nueva versión: $apiVersion');
+          } else {
+            print('Versión actual ($apiVersion) ya sincronizada.');
+          }
+        } else {
+          print('No se pudo obtener la versión de la API.');
+        }
+      } catch (e) {
+        print('Error al verificar versión y sincronizar: $e');
+      }
     } catch (e) {
       setState(() {
         _coordinator.uiState.setLoading(false);

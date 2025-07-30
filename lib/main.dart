@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
         '/search': (context) => SearchScreen(),
         '/main_menu': (context) => MainMenu(),
         '/targetas': (context) => WordCardsScreen(),
+        '/SearchScreen': (context) => SearchScreen(),
       },
     );
   }

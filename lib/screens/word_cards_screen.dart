@@ -14,7 +14,6 @@ class WordCardsScreen extends StatefulWidget {
 }
 
 class _WordCardsScreenState extends State<WordCardsScreen> {
-
   Future<void> guardarActividadReciente(String actividad) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> recientes = prefs.getStringList('recientes') ?? [];
@@ -22,6 +21,7 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
     if (recientes.length > 3) recientes = recientes.sublist(0, 3);
     await prefs.setStringList('recientes', recientes);
   }
+
   // Índice actual del navbar (1 = Búsqueda activa)
   int _currentIndex = 1;
 
@@ -46,6 +46,7 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
       };
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -134,195 +135,200 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
   Widget _buildWordCard() {
     return GestureDetector(
       onTap: () {
-    guardarActividadReciente(wordData as String);
+        guardarActividadReciente(wordData as String);
       },
       child: Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          //  HEADER CON COLOR SÓLIDO
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Color.fromARGB(255, 1, 84, 95),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
+        margin: const EdgeInsets.only(bottom: 20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
-            child: Row(
-              children: [
-                // Círculo con letra inicial
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      wordData['word'][0].toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            //  HEADER CON COLOR SÓLIDO
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 1, 84, 95),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
                 ),
-                const SizedBox(width: 12),
-                // Información de la palabra
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        wordData['word'],
+              ),
+              child: Row(
+                children: [
+                  // Círculo con letra inicial
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        wordData['word'][0].toUpperCase(),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        wordData['subtitle'],
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // Información de la palabra
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          wordData['word'],
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
+                        Text(
+                          wordData['subtitle'],
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
-          // ===== ÁREA GRIS PARA IMAGEN =====
-          Container(
-            width: double.infinity,
-            height: 120,
-            decoration: BoxDecoration(color: Colors.grey[200]),
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+            // ===== ÁREA GRIS PARA IMAGEN =====
+            Container(
+              width: double.infinity,
+              height: 120,
+              decoration: BoxDecoration(color: Colors.grey[200]),
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.image_outlined,
+                      size: 40,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(width: 20),
+                    Icon(
+                      Icons.settings_outlined,
+                      size: 30,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(width: 20),
+                    Icon(
+                      Icons.description_outlined,
+                      size: 30,
+                      color: Colors.grey[400],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ÁREA DE CONTENIDO CON GRADIENTE
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromARGB(255, 1, 84, 95),
+                    Color.fromARGB(255, 20, 170, 70),
+                  ],
+                  stops: [0.0, 1.0],
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.image_outlined, size: 40, color: Colors.grey[400]),
-                  const SizedBox(width: 20),
-                  Icon(
-                    Icons.settings_outlined,
-                    size: 30,
-                    color: Colors.grey[400],
+                  // Título en área con gradiente
+                  Text(
+                    wordData['word'],
+                    style: const TextStyle(
+                      color: Colors.white, // TEXTO BLANCO PARA CONTRASTE
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const SizedBox(width: 20),
-                  Icon(
-                    Icons.description_outlined,
-                    size: 30,
-                    color: Colors.grey[400],
+                  Text(
+                    wordData['subtitle'],
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.9),
+                      fontSize: 14,
+                    ),
                   ),
-                ],
-              ),
-            ),
-          ),
+                  const SizedBox(height: 12),
 
-          // ÁREA DE CONTENIDO CON GRADIENTE
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color.fromARGB(255, 1, 84, 95),
-                  Color.fromARGB(255, 20, 170, 70),
-                ],
-                stops: [0.0, 1.0],
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(16),
-                bottomRight: Radius.circular(16),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Título en área con gradiente
-                Text(
-                  wordData['word'],
-                  style: const TextStyle(
-                    color: Colors.white, // TEXTO BLANCO PARA CONTRASTE
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                  // Descripción
+                  Text(
+                    wordData['description'],
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.95),
+                      fontSize: 14,
+                      height: 1.5,
+                    ),
                   ),
-                ),
-                Text(
-                  wordData['subtitle'],
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 12),
+                  const SizedBox(height: 16),
 
-                // Descripción
-                Text(
-                  wordData['description'],
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.95),
-                    fontSize: 14,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Botón de favorito
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        wordData['isFavorite'] = !wordData['isFavorite'];
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: wordData['isFavorite']
-                            ? Colors.red.withOpacity(0.3)
-                            : Colors.white.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        wordData['isFavorite']
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: wordData['isFavorite']
-                            ? Colors.red[200]
-                            : Colors.white,
-                        size: 24,
+                  // Botón de favorito
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          wordData['isFavorite'] = !wordData['isFavorite'];
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: wordData['isFavorite']
+                              ? Colors.red.withOpacity(0.3)
+                              : Colors.white.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          wordData['isFavorite']
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: wordData['isFavorite']
+                              ? Colors.red[200]
+                              : Colors.white,
+                          size: 24,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),);
+    );
   }
 
   //  NAVEGACIÓN ENTRE PANTALLAS

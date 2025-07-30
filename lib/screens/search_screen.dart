@@ -5,6 +5,7 @@ import 'package:devtionary_app/db/repositorios/instrucciones_repository.dart';
 import 'package:devtionary_app/db/db_models/terminos.dart';
 import 'package:devtionary_app/db/db_models/comandos.dart';
 import 'package:devtionary_app/db/db_models/instrucciones.dart';
+import 'package:devtionary_app/widgets/resultado_card.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -38,6 +39,16 @@ class _SearchScreenState extends State<SearchScreen> {
         (i) => i.nombre_instruccion.toLowerCase().contains(lowerQuery),
       ),
     ];
+    print('Resultados obtenidos:');
+    for (var item in filtered) {
+      if (item is Terminos) {
+        print('Término: \\${item.nombre_termino}');
+      } else if (item is Comandos) {
+        print('Comando: \\${item.nombre_comando}');
+      } else if (item is Instrucciones) {
+        print('Instrucción: \\${item.nombre_instruccion}');
+      }
+    }
     setState(() {
       _results = filtered;
       _loading = false;
@@ -78,9 +89,19 @@ class _SearchScreenState extends State<SearchScreen> {
                         : item is Comandos
                         ? 'Comando'
                         : 'Instrucción';
-                    return ListTile(
-                      title: Text(item.nombre),
-                      subtitle: Text(tipo),
+                    String nombre = item is Terminos
+                        ? item.nombre_termino
+                        : item is Comandos
+                        ? item.nombre_comando
+                        : item.nombre_instruccion;
+                    return ResultadoCard(
+                      titulo: nombre,
+                      subtitulo: tipo,
+                      icons: [
+                        if (item is Terminos) Icons.category,
+                        if (item is Comandos) Icons.code,
+                        if (item is Instrucciones) Icons.info_outline,
+                      ],
                       onTap: () {
                         //navegación a la pantalla de detalle
                       },
