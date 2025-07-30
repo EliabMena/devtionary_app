@@ -1,29 +1,50 @@
 import 'package:devtionary_app/Utility/thems/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:devtionary_app/widgets/nav_button.dart';
-import 'package:devtionary_app/widgets/search_bar.dart';
+import 'package:devtionary_app/widgets/nav_button.dart' hide CustomBottomNavBar;
+import 'package:devtionary_app/widgets/searchbar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:devtionary_app/widgets/custom_bottom_navbar.dart';
 
 class WordCardsScreen extends StatefulWidget {
+  final Map<String, dynamic>? wordData;
+  const WordCardsScreen({Key? key, this.wordData}) : super(key: key);
   @override
   _WordCardsScreenState createState() => _WordCardsScreenState();
 }
 
 class _WordCardsScreenState extends State<WordCardsScreen> {
+
+  Future<void> guardarActividadReciente(String actividad) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> recientes = prefs.getStringList('recientes') ?? [];
+    recientes.insert(0, actividad);
+    if (recientes.length > 3) recientes = recientes.sublist(0, 3);
+    await prefs.setStringList('recientes', recientes);
+  }
   // Índice actual del navbar (1 = Búsqueda activa)
   int _currentIndex = 1;
 
   // Controlador para la barra de búsqueda
   final TextEditingController _searchController = TextEditingController();
 
-  // Datos de la palabra
-  Map<String, dynamic> wordData = {
-    'word': 'Palabra',
-    'subtitle': 'A que pertenece',
-    'description':
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    'isFavorite': false,
-  };
+  // Datos de la palabra de forma temporal
+  late Map<String, dynamic> wordData;
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.wordData != null) {
+      wordData = widget.wordData!;
+    } else {
+      wordData = {
+        'word': 'Palabra',
+        'subtitle': 'A que pertenece',
+        'description':
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'isFavorite': false,
+      };
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,8 +123,6 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
           setState(() {
             _currentIndex = index;
           });
-
-          // Navegación entre pantallas
           _navigateToScreen(index);
         },
       ),
@@ -112,7 +131,11 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
 
   //  MÉTODO PARA CREAR LA TARJETA DE PALABRA
   Widget _buildWordCard() {
-    return Container(
+    return GestureDetector(
+      onTap: () {
+    guardarActividadReciente(wordData as String);
+      },
+      child: Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
@@ -298,7 +321,7 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
           ),
         ],
       ),
-    );
+    ),);
   }
 
   //  NAVEGACIÓN ENTRE PANTALLAS
