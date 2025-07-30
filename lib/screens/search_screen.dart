@@ -19,16 +19,24 @@ class _SearchScreenState extends State<SearchScreen> {
   bool _loading = false;
 
   Future<void> _search(String query) async {
-    setState(() { _loading = true; });
-    final terminos = await TerminosRepository().getTerminosLocales();
-    final comandos = await ComandosRepository().getComandosLocales();
-    final instrucciones = await InstruccionesRepository().getInstruccionesLocales();
+    setState(() {
+      _loading = true;
+    });
+    final terminos = await TerminosRepository().getTerminos();
+    final comandos = await ComandosRepository().getComandos();
+    final instrucciones = await InstruccionesRepository().getInstrucciones();
 
     final lowerQuery = query.toLowerCase();
     final filtered = [
-      ...terminos.where((t) => t.nombre_termino.toLowerCase().contains(lowerQuery)),
-      ...comandos.where((c) => c.nombre_comando.toLowerCase().contains(lowerQuery)),
-      ...instrucciones.where((i) => i.nombre_instruccion.toLowerCase().contains(lowerQuery)),
+      ...terminos.where(
+        (t) => t.nombre_termino.toLowerCase().contains(lowerQuery),
+      ),
+      ...comandos.where(
+        (c) => c.nombre_comando.toLowerCase().contains(lowerQuery),
+      ),
+      ...instrucciones.where(
+        (i) => i.nombre_instruccion.toLowerCase().contains(lowerQuery),
+      ),
     ];
     setState(() {
       _results = filtered;
@@ -68,8 +76,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     String tipo = item is Terminos
                         ? 'Término'
                         : item is Comandos
-                            ? 'Comando'
-                            : 'Instrucción';
+                        ? 'Comando'
+                        : 'Instrucción';
                     return ListTile(
                       title: Text(item.nombre),
                       subtitle: Text(tipo),

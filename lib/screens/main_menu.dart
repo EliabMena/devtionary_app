@@ -8,12 +8,11 @@ import 'package:devtionary_app/screens/word_cards_screen.dart';
 import 'package:devtionary_app/db/repositorios/subcategorias_repository.dart';
 
 class MainMenu extends StatelessWidget {
-
   Future<List<String>> obtenerRecientes() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getStringList('recientes') ?? [];
   }
-  
+
   // Recupera la información de la palabra desde SharedPreferences (puedes guardar más info si lo necesitas)
   Future<Map<String, dynamic>?> obtenerInfoPalabra(String palabra) async {
     final prefs = await SharedPreferences.getInstance();
@@ -51,7 +50,10 @@ class MainMenu extends StatelessWidget {
               }
               final recientes = snapshot.data ?? [];
               if (recientes.isEmpty) {
-                return Text('No hay actividades recientes', style: TextStyle(color: Colors.white70));
+                return Text(
+                  'No hay actividades recientes',
+                  style: TextStyle(color: Colors.white70),
+                );
               }
               return Column(
                 children: List.generate(recientes.length, (index) {
@@ -66,24 +68,29 @@ class MainMenu extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: ListTile(
-                      leading: Icon(Icons.arrow_forward_ios, color: Colors.white),
+                      leading: Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.white,
+                      ),
                       title: Text(
                         recientes[index],
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    onTap: () async {
-                      final info = await obtenerInfoPalabra(recientes[index]);
-                      if (info != null) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => WordCardsScreen(
-                              wordData: info,
+                      onTap: () async {
+                        final info = await obtenerInfoPalabra(recientes[index]);
+                        if (info != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  WordCardsScreen(wordData: info),
                             ),
-                          ),
-                        );
-                      }
-                    },
+                          );
+                        }
+                      },
                     ),
                   );
                 }),
@@ -108,7 +115,12 @@ class MainMenu extends StatelessWidget {
                 return Center(child: CircularProgressIndicator());
               }
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(child: Text('No hay categorías', style: TextStyle(color: Colors.white70)));
+                return Center(
+                  child: Text(
+                    'No hay categorías',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                );
               }
               final subcategorias = snapshot.data!;
               return SizedBox(
@@ -123,31 +135,80 @@ class MainMenu extends StatelessWidget {
                       switch (cat.id_subcategoria.toString()) {
                         case '1':
                           gradient = [Color(0xFF7F00FF), Color(0xFFE100FF)];
-                          iconWidget = Text('Docker', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22));
+                          iconWidget = Text(
+                            'Docker',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                            ),
+                          );
                           break;
                         case '2':
                           gradient = [Color(0xFF005BEA), Color(0xFF00C6FB)];
-                          iconWidget = Text('Git Bash', style: TextStyle(color: Colors.yellow, fontWeight: FontWeight.bold, fontSize: 22));
+                          iconWidget = Text(
+                            'Git Bash',
+                            style: TextStyle(
+                              color: Colors.yellow,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                            ),
+                          );
                           break;
                         case '3':
                           gradient = [Color(0xFF00C6FB), Color(0xFF43E97B)];
-                          iconWidget = Text('Linux', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 22));
+                          iconWidget = Text(
+                            'Linux',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                            ),
+                          );
                           break;
                         case '4':
                           gradient = [Color(0xFF7F00FF), Color(0xFFE100FF)];
-                          iconWidget = Text('Docker', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22));
+                          iconWidget = Text(
+                            'Docker',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                            ),
+                          );
                           break;
                         case '5':
                           gradient = [Color(0xFF005BEA), Color(0xFF00C6FB)];
-                          iconWidget = Text('Git Bash', style: TextStyle(color: Colors.yellow, fontWeight: FontWeight.bold, fontSize: 22));
+                          iconWidget = Text(
+                            'Git Bash',
+                            style: TextStyle(
+                              color: Colors.yellow,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                            ),
+                          );
                           break;
                         case '6':
                           gradient = [Color(0xFF00C6FB), Color(0xFF43E97B)];
-                          iconWidget = Text('Linux', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 22));
+                          iconWidget = Text(
+                            'Linux',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                            ),
+                          );
                           break;
                         default:
-                          gradient = [Colors.grey.shade800, Colors.grey.shade600];
-                          iconWidget = Icon(Icons.code, color: Colors.white, size: 28);
+                          gradient = [
+                            Colors.grey.shade800,
+                            Colors.grey.shade600,
+                          ];
+                          iconWidget = Icon(
+                            Icons.code,
+                            color: Colors.white,
+                            size: 28,
+                          );
                       }
                       return Container(
                         width: 140,

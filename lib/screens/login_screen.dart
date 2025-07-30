@@ -157,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (result.success) {
       _showMessage('¡Inicio de sesión exitoso!');
-      // Aquí puedes navegar a la pantalla principal o dashboard
+      Navigator.pushReplacementNamed(context, '/main_menu');
     } else {
       _showMessage(
         result.error ?? 'Error en el inicio de sesión con Google',

@@ -149,4 +149,13 @@ class SubcategoriasRepository {
         return 'Error del servidor: $statusCode';
     }
   }
+
+  /// Método público para obtener subcategorías locales
+  Future<List<Subcategorias>> getSubcategoriasLocales() async {
+    final db = await DatabaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query('subcategorias');
+    return List.generate(maps.length, (i) {
+      return Subcategorias.fromJson(maps[i]);
+    });
+  }
 }

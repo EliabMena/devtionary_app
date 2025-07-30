@@ -88,7 +88,7 @@ class RegisterCoordinator {
 
       if (result.success) {
         // TODO: Navegar a la pantalla principal cuando esté lista
-        Navigator.pushReplacementNamed(_context, '/targetas');
+        Navigator.pushReplacementNamed(_context, '/main_menu');
       }
     } finally {
       _uiStateManager.setLoading(false);

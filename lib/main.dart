@@ -1,5 +1,7 @@
+import 'package:devtionary_app/screens/main_menu.dart';
 import 'package:devtionary_app/screens/register_screen.dart';
 import 'package:devtionary_app/screens/login_screen.dart';
+import 'package:devtionary_app/screens/search_screen.dart';
 import 'package:devtionary_app/screens/word_cards_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -27,6 +29,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/register': (context) => RegisterScreen(),
         '/login': (context) => LoginScreen(),
+        '/search': (context) => SearchScreen(),
+        '/main_menu': (context) => MainMenu(),
         '/targetas': (context) => WordCardsScreen(),
       },
     );
