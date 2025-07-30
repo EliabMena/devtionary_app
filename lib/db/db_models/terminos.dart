@@ -3,7 +3,7 @@ class Terminos {
   final int id_subcategoria;
   final String nombre_termino;
   final String descripcion;
-  final String ejemplo;
+  final String? ejemplo;
   final String fecha_creacion;
   final String fecha_actualizacion;
 
@@ -13,7 +13,7 @@ class Terminos {
     required this.id_subcategoria,
     required this.nombre_termino,
     required this.descripcion,
-    required this.ejemplo,
+    this.ejemplo,
     required this.fecha_creacion,
     required this.fecha_actualizacion,
   });
@@ -24,7 +24,7 @@ class Terminos {
       id_subcategoria: json['id_subcategoria'] as int,
       nombre_termino: json['nombre_termino'] as String,
       descripcion: json['descripcion'] as String,
-      ejemplo: json['ejemplo'] as String,
+      ejemplo: json['ejemplo'] as String?,
       fecha_creacion: json['fecha_creacion'] as String,
       fecha_actualizacion: json['fecha_actualizacion'] as String,
     );

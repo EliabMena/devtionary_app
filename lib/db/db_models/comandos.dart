@@ -3,7 +3,7 @@ class Comandos {
   final int id_subcategoria;
   final String nombre_comando;
   final String descripcion;
-  final String ejemplo;
+  final String? ejemplo;
   final String? ejemplo_2;
   final String? ejemplo_3;
   final String fecha_creacion;
@@ -15,7 +15,7 @@ class Comandos {
     required this.id_subcategoria,
     required this.nombre_comando,
     required this.descripcion,
-    required this.ejemplo,
+    this.ejemplo,
     this.ejemplo_2,
     this.ejemplo_3,
     required this.fecha_creacion,
@@ -27,7 +27,7 @@ class Comandos {
       id_subcategoria: json['id_subcategoria'] as int,
       nombre_comando: json['nombre_comando'] as String,
       descripcion: json['descripcion'] as String,
-      ejemplo: json['ejemplo'] as String,
+      ejemplo: json['ejemplo'] as String?,
       ejemplo_2: json['ejemplo_2'] as String?,
       ejemplo_3: json['ejemplo_3'] as String?,
       fecha_creacion: json['fecha_creacion'] as String,

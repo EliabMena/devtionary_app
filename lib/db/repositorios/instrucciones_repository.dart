@@ -135,6 +135,74 @@ class InstruccionesRepository {
     );
   }
 
+  Future<List<Instrucciones>> getInstrucciones() async {
+    final db = await DatabaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query('instrucciones');
+
+    return List.generate(maps.length, (i) {
+      return Instrucciones.fromJson(maps[i]);
+    });
+  }
+
+  // Método para obtener instrucciones por nombre de subcategoría
+  Future<List<Instrucciones>> getInstruccionesPorSubcategoria(
+    String nombreSubcategoria,
+  ) async {
+    final db = await DatabaseHelper.database;
+
+    // Realizar JOIN entre las tablas instrucciones y subcategorias
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      '''
+      SELECT i.* 
+      FROM instrucciones i
+      INNER JOIN subcategorias s ON i.id_subcategoria = s.id_subcategoria
+      WHERE s.nombre = ?
+      ORDER BY i.nombre_instruccion ASC
+    ''',
+      [nombreSubcategoria],
+    );
+
+    return List.generate(maps.length, (i) {
+      return Instrucciones.fromJson(maps[i]);
+    });
+  }
+
+  // Método para buscar instrucciones por nombre (búsqueda parcial)
+  Future<List<Instrucciones>> buscarInstruccionesPorNombre(
+    String nombre,
+  ) async {
+    final db = await DatabaseHelper.database;
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      'instrucciones',
+      where: 'nombre_instruccion LIKE ?',
+      whereArgs: ['%$nombre%'],
+      orderBy: 'nombre_instruccion ASC',
+    );
+
+    return List.generate(maps.length, (i) {
+      return Instrucciones.fromJson(maps[i]);
+    });
+  }
+
+  // Método para buscar instrucciones por palabras en la descripción
+  Future<List<Instrucciones>> buscarInstruccionesPorDescripcion(
+    String palabraClave,
+  ) async {
+    final db = await DatabaseHelper.database;
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      'instrucciones',
+      where: 'descripcion LIKE ?',
+      whereArgs: ['%$palabraClave%'],
+      orderBy: 'nombre_instruccion ASC',
+    );
+
+    return List.generate(maps.length, (i) {
+      return Instrucciones.fromJson(maps[i]);
+    });
+  }
+
   String _getErrorMessage(int statusCode) {
     switch (statusCode) {
       case 401:

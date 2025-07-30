@@ -41,7 +41,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // Inicializar coordinador con callback para actualizar el estado
     _coordinator = RegisterCoordinator(
       context: context,
@@ -51,12 +51,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }
       },
     );
-    
+
     // Configurar listeners de scroll usando ScrollHelper
     ScrollHelper.setupFocusListeners(
       focusNodes: {
         _usernameFocusNode: 100.0, // Posición aproximada del campo usuario
-        _emailFocusNode: 150.0,    // Posición aproximada del campo email
+        _emailFocusNode: 150.0, // Posición aproximada del campo email
         _passwordFocusNode: 200.0, // Posición aproximada del campo contraseña
       },
       scrollController: _scrollController,
@@ -90,11 +90,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // Métodos de manejo de formulario que delegan al coordinador
   Future<void> _handleRegister() async {
-    await _coordinator.handleEmailRegister(
-      email: _emailController.text,
-      password: _passwordController.text,
-      username: _usernameController.text,
-    );
+    print('PANTALLA: _handleRegister');
+    // Deshabilitar el botón inmediatamente para evitar doble llamada
+    if (_coordinator.uiState.isLoading) return;
+    setState(() {
+      _coordinator.uiState.setLoading(true);
+    });
+    try {
+      await _coordinator.handleEmailRegister(
+        email: _emailController.text,
+        password: _passwordController.text,
+        username: _usernameController.text,
+      );
+    } catch (e) {
+      setState(() {
+        _coordinator.uiState.setLoading(false);
+      });
+      rethrow;
+    }
   }
 
   Future<void> _handleGoogleSignIn() async {
@@ -150,8 +163,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
           gradient: RadialGradient(
-            colors: [primaryGradientColor, secondaryGradientColor, Colors.black],
-            stops: [0.2, 0.4, 0.7], // Ajuste de donde Inicia el degradado y termina
+            colors: [
+              primaryGradientColor,
+              secondaryGradientColor,
+              Colors.black,
+            ],
+            stops: [
+              0.2,
+              0.4,
+              0.7,
+            ], // Ajuste de donde Inicia el degradado y termina
             center: Alignment.bottomCenter,
             radius: MediaQuery.of(context).viewInsets.bottom > 0
                 ? 1.5 // Gradiente más grande cuando hay teclado
@@ -163,7 +184,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Padding(
             padding: const EdgeInsets.all(25.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // Alinea a la izquierda
+              crossAxisAlignment:
+                  CrossAxisAlignment.start, // Alinea a la izquierda
               children: [
                 Align(alignment: Alignment.topLeft),
                 SizedBox(height: 0),
@@ -187,10 +209,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // Texto con enlace para navegar a la pantalla de login
                 RichText(
                   text: TextSpan(
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 18),
                     children: [
                       TextSpan(text: '¿Ya tienes cuenta? '),
                       TextSpan(
@@ -211,7 +230,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
-                
+
                 // Campo de entrada para el nombre de usuario
                 TextInput(
                   inputController: _usernameController,
@@ -222,7 +241,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   focusNode: _usernameFocusNode,
                   onChanged: _validateUsername,
                 ),
-                
+
                 // Campo de entrada para el email con validación en tiempo real
                 TextInput(
                   inputController: _emailController,
@@ -250,18 +269,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(height: 38),
                 // Botón principal para crear cuenta
                 BtnBasic(
-                  text: _coordinator.uiState.isLoading ? 'Creando cuenta...' : 'Crear cuenta',
-                  onPressed: _coordinator.uiState.isLoading ? null : _handleRegister,
+                  text: _coordinator.uiState.isLoading
+                      ? 'Creando cuenta...'
+                      : 'Crear cuenta',
+                  onPressed: _coordinator.uiState.isLoading
+                      ? null
+                      : _handleRegister,
                 ),
                 SizedBox(height: 12),
                 // Botón alternativo para autenticación con Google
                 GoogleButton(
-                  onPressed: _coordinator.uiState.isGoogleLoading ? null : _handleGoogleSignIn,
-                  text: _coordinator.uiState.isGoogleLoading ? 'Cargando...' : 'Continuar con Google',
-                  isEnabled: !_coordinator.uiState.isGoogleLoading && !_coordinator.uiState.isLoading,
+                  onPressed: _coordinator.uiState.isGoogleLoading
+                      ? null
+                      : _handleGoogleSignIn,
+                  text: _coordinator.uiState.isGoogleLoading
+                      ? 'Cargando...'
+                      : 'Continuar con Google',
+                  isEnabled:
+                      !_coordinator.uiState.isGoogleLoading &&
+                      !_coordinator.uiState.isLoading,
                 ),
                 // Espacio dinámico que se ajusta según la altura del teclado
-                SizedBox(height: MediaQuery.of(context).viewInsets.bottom,),
+                SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
               ],
             ),
           ),

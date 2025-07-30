@@ -55,14 +55,12 @@ class TerminosRepository {
       if (terminosLocales.isEmpty) {
         // Situación 1: La tabla está vacía - insertar todos los términos de la API
         await _insertarTodosLosTerminos(terminosAPI);
-        print('${terminosAPI.length} términos insertados desde la API');
       } else {
         // Situación 2 y 3: Comparar y sincronizar
         await _compararYSincronizar(terminosLocales, terminosAPI);
       }
 
       // Paso 3: La conexión se cierra automáticamente
-      print('Sincronización de términos completada');
     } catch (e) {
       throw Exception('Error durante la sincronización: $e');
     }
@@ -73,9 +71,7 @@ class TerminosRepository {
     final db = await DatabaseHelper.database;
     final List<Map<String, dynamic>> maps = await db.query('terminos');
 
-    return List.generate(maps.length, (i) {
-      return Terminos.fromJson(maps[i]);
-    });
+    return List<Terminos>.from(maps.map((m) => Terminos.fromJson(m)));
   }
 
   // Método auxiliar para insertar todos los términos
@@ -123,10 +119,70 @@ class TerminosRepository {
       }
       // Situación 2.1: Fechas iguales - no hacer nada
     }
+  }
 
-    print(
-      'Sincronización completada: $insertadas insertadas, $actualizadas actualizadas',
+  Future<List<Terminos>> getTerminos() async {
+    final db = await DatabaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query('terminos');
+
+    return List<Terminos>.from(maps.map((m) => Terminos.fromJson(m)));
+  }
+
+  // Método para obtener términos por nombre de subcategoría
+  Future<List<Terminos>> getTerminosPorSubcategoria(
+    String nombreSubcategoria,
+  ) async {
+    final db = await DatabaseHelper.database;
+
+    // Realizar JOIN entre las tablas terminos y subcategorias
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      '''
+      SELECT t.* 
+      FROM terminos t
+      INNER JOIN subcategorias s ON t.id_subcategoria = s.id_subcategoria
+      WHERE s.nombre = ?
+      ORDER BY t.nombre_termino ASC
+    ''',
+      [nombreSubcategoria],
     );
+
+    return List.generate(maps.length, (i) {
+      return Terminos.fromJson(maps[i]);
+    });
+  }
+
+  // Método para buscar términos por nombre (búsqueda exacta o parcial)
+  Future<List<Terminos>> buscarTerminosPorNombre(String nombre) async {
+    final db = await DatabaseHelper.database;
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      'terminos',
+      where: 'nombre_termino LIKE ?',
+      whereArgs: ['%$nombre%'],
+      orderBy: 'nombre_termino ASC',
+    );
+
+    return List.generate(maps.length, (i) {
+      return Terminos.fromJson(maps[i]);
+    });
+  }
+
+  // Método para buscar términos por palabras en la descripción
+  Future<List<Terminos>> buscarTerminosPorDescripcion(
+    String palabraClave,
+  ) async {
+    final db = await DatabaseHelper.database;
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      'terminos',
+      where: 'descripcion LIKE ?',
+      whereArgs: ['%$palabraClave%'],
+      orderBy: 'nombre_termino ASC',
+    );
+
+    return List.generate(maps.length, (i) {
+      return Terminos.fromJson(maps[i]);
+    });
   }
 
   String _getErrorMessage(int statusCode) {
