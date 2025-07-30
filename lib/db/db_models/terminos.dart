@@ -36,7 +36,7 @@ class Terminos {
       'id_subcategoria': id_subcategoria,
       'nombre_termino': nombre_termino,
       'descripcion': descripcion,
-      'ejemplo': ejemplo,
+      'ejemplo': ejemplo ?? '',
       'fecha_creacion': fecha_creacion,
       'fecha_actualizacion': fecha_actualizacion,
     };

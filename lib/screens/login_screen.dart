@@ -1,3 +1,6 @@
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:devtionary_app/Utility/thems/app_colors.dart';
 import 'package:devtionary_app/Utility/validations/email_vlitations.dart';
 import 'package:devtionary_app/screens/register_screen.dart';
@@ -5,6 +8,7 @@ import 'package:devtionary_app/widgets/btn_basic.dart';
 import 'package:devtionary_app/widgets/btn_google.dart';
 import 'package:devtionary_app/widgets/text_input.dart';
 import 'package:devtionary_app/services/auth_service.dart';
+import 'package:devtionary_app/db/repositorios/terminos_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 
@@ -98,7 +102,10 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => RegisterScreen()),
-    );
+    ).then((_) async {
+      // Sincronizar términos después de registro
+      await TerminosRepository().sincronizarTerminos();
+    });
   }
 
   // Manejar el inicio de sesión con email y contraseña
@@ -132,7 +139,28 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (result.success) {
       _showMessage('¡Inicio de sesión exitoso!');
-      Navigator.pushReplacementNamed(context, '/main_menu');
+      // Verificar versión de API y sincronizar si es nueva
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final response = await http.get(Uri.parse('https://devtionary-api-production.up.railway.app/api/user/health'));
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          final apiVersion = data['version'] ?? '';
+          final localVersion = prefs.getString('api_version') ?? '';
+          if (apiVersion != localVersion) {
+            await TerminosRepository().sincronizarTerminos();
+            await prefs.setString('api_version', apiVersion);
+            print('Sincronización realizada por nueva versión: $apiVersion');
+          } else {
+            print('Versión actual ($apiVersion) ya sincronizada.');
+          }
+        } else {
+          print('No se pudo obtener la versión de la API.');
+        }
+      } catch (e) {
+        print('Error al verificar versión y sincronizar: $e');
+      }
+      Navigator.pushReplacementNamed(context, '/SearchScreen');
     } else {
       _showMessage(
         result.error ?? 'Error en el inicio de sesión',
@@ -156,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (result.success) {
       _showMessage('¡Inicio de sesión exitoso!');
-      Navigator.pushReplacementNamed(context, '/main_menu');
+      Navigator.pushReplacementNamed(context, '/SearchScreen');
     } else {
       _showMessage(
         result.error ?? 'Error en el inicio de sesión con Google',
