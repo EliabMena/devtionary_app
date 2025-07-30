@@ -32,7 +32,7 @@ class DatabaseHelper {
           id_categoria INTEGER PRIMARY KEY,
           nombre TEXT NOT NULL,
           fecha_creacion TEXT NOT NULL,
-          fecha_actualizacion TEXT NOT NULL,
+          fecha_actualizacion TEXT NOT NULL
         )
       ''');
       //Crear la tabla de subcategorías
