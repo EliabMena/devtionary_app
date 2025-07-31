@@ -24,40 +24,45 @@ class _SearchScreenState extends State<SearchScreen> {
   List<dynamic> _results = [];
   bool _loading = false;
 
-  Future<void> _search(String query) async {
+  Future<void> _searchAdvanced(String query) async {
     setState(() {
       _loading = true;
     });
-    final terminos = await TerminosRepository().getTerminos();
-    final comandos = await ComandosRepository().getComandos();
-    final instrucciones = await InstruccionesRepository().getInstrucciones();
 
-    final lowerQuery = query.toLowerCase();
-    final filtered = [
-      ...terminos.where(
-        (t) => t.nombre_termino.toLowerCase().contains(lowerQuery),
-      ),
-      ...comandos.where(
-        (c) => c.nombre_comando.toLowerCase().contains(lowerQuery),
-      ),
-      ...instrucciones.where(
-        (i) => i.nombre_instruccion.toLowerCase().contains(lowerQuery),
-      ),
-    ];
-    print('Resultados obtenidos:');
-    for (var item in filtered) {
-      if (item is Terminos) {
-        print('Término: \\${item.nombre_termino}');
-      } else if (item is Comandos) {
-        print('Comando: \\${item.nombre_comando}');
-      } else if (item is Instrucciones) {
-        print('Instrucción: \\${item.nombre_instruccion}');
+    try {
+      final terminosRepo = TerminosRepository();
+      final comandosRepo = ComandosRepository();
+      final instruccionesRepo = InstruccionesRepository();
+
+      // Búsquedas paralelas en nombre Y descripción
+      final results = await Future.wait([
+        // Búsqueda en nombres
+        terminosRepo.buscarTerminosPorNombre(query),
+        comandosRepo.buscarComandosPorNombre(query),
+        instruccionesRepo.buscarInstruccionesPorNombre(query),
+        // Búsqueda en descripciones
+        terminosRepo.buscarTerminosPorDescripcion(query),
+        comandosRepo.buscarComandosPorDescripcion(query),
+        instruccionesRepo.buscarInstruccionesPorDescripcion(query),
+      ]);
+
+      // Combinar y eliminar duplicados
+      final Set<dynamic> uniqueResults = {};
+      for (var resultList in results) {
+        uniqueResults.addAll(resultList);
       }
+
+      setState(() {
+        _results = uniqueResults.toList();
+        _loading = false;
+      });
+    } catch (e) {
+      print('Error en búsqueda: $e');
+      setState(() {
+        _results = [];
+        _loading = false;
+      });
     }
-    setState(() {
-      _results = filtered;
-      _loading = false;
-    });
   }
 
   @override
@@ -100,7 +105,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           // Actualiza la búsqueda en tiempo real si lo deseas
                         },
                         onSubmitted: (value) {
-                          _search(value);
+                          _searchAdvanced(value);
                         },
                       ),
                     ),

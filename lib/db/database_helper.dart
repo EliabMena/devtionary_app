@@ -2,38 +2,40 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'repositorios/comandos_repository.dart';
+import 'repositorios/terminos_repository.dart';
+import 'repositorios/instrucciones_repository.dart';
 
 class DatabaseHelper {
   // Buscar palabra por nombre en terminos, comandos e instrucciones
+
   static Future<Map<String, dynamic>?> buscarPorNombre(String nombre) async {
-    final db = await database;
-    // Buscar en terminos
-    final terminos = await db.query(
-      'terminos',
-      where: 'nombre_termino = ?',
-      whereArgs: [nombre],
-    );
+    // Crear instancias de los repositorios
+    final terminosRepo = TerminosRepository();
+    final comandosRepo = ComandosRepository();
+    final instruccionesRepo = InstruccionesRepository();
+
+    // Buscar en terminos usando el repositorio
+    final terminos = await terminosRepo.buscarTerminosPorNombre(nombre);
     if (terminos.isNotEmpty) {
-      return {'tabla': 'terminos', ...terminos.first};
+      // Convertir el objeto Terminos a Map y agregar info de tabla
+      return {'tabla': 'terminos', ...terminos.first.toJson()};
     }
-    // Buscar en comandos
-    final comandos = await db.query(
-      'comandos',
-      where: 'nombre_comando = ?',
-      whereArgs: [nombre],
-    );
+
+    // Buscar en comandos usando el repositorio
+    final comandos = await comandosRepo.buscarComandosPorNombre(nombre);
     if (comandos.isNotEmpty) {
-      return {'tabla': 'comandos', ...comandos.first};
+      return {'tabla': 'comandos', ...comandos.first.toJson()};
     }
-    // Buscar en instrucciones
-    final instrucciones = await db.query(
-      'instrucciones',
-      where: 'nombre_instruccion = ?',
-      whereArgs: [nombre],
+
+    // Buscar en instrucciones usando el repositorio
+    final instrucciones = await instruccionesRepo.buscarInstruccionesPorNombre(
+      nombre,
     );
     if (instrucciones.isNotEmpty) {
-      return {'tabla': 'instrucciones', ...instrucciones.first};
+      return {'tabla': 'instrucciones', ...instrucciones.first.toJson()};
     }
+
     return null;
   }
 
@@ -53,7 +55,7 @@ class DatabaseHelper {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, fileName);
 
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(path, version: 2, onCreate: _createDB);
   }
 
   // Crear las tablas
@@ -85,8 +87,8 @@ class DatabaseHelper {
           id_termino INTEGER PRIMARY KEY,
           id_subcategoria INTEGER,
           nombre_termino TEXT NOT NULL,
-          descripcion REAL NOT NULL,
-          ejemplo INTEGER NOT NULL,
+          descripcion TEXT NOT NULL,
+          ejemplo TEXT NOT NULL,
           fecha_creacion TEXT NOT NULL,
           fecha_actualizacion TEXT NOT NULL,
           FOREIGN KEY (id_subcategoria) REFERENCES subcategorias(id_subcategoria)
@@ -119,6 +121,22 @@ class DatabaseHelper {
           fecha_actualizacion TEXT NOT NULL,
           FOREIGN KEY (id_subcategoria) REFERENCES subcategorias(id_subcategoria)
           )
+      ''');
+
+      await txn.execute('''
+        CREATE TABLE IF NOT EXISTS preguntasa (
+          id_pregunta INTEGER PRIMARY KEY,
+          respuesta_correcta TEXT NOT NULL,
+          respuesta_incorrecta_1 TEXT NOT NULL,
+          respuesta_incorrecta_2 TEXT NOT NULL,
+          respuesta_incorrecta_3 TEXT NOT NULL,
+          fecha_creacion TEXT NOT NULL,
+          fecha_actualizacion TEXT NOT NULL,
+          id_subcategoria INTEGER,
+          id_categoria INTEGER,
+          FOREIGN KEY (id_subcategoria) REFERENCES subcategorias(id_subcategoria),
+          FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
+        )
       ''');
     });
   }
