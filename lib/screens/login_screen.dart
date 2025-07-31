@@ -138,6 +138,13 @@ class _LoginScreenState extends State<LoginScreen> {
       email: _emailController.text.trim(),
       password: _passwordController.text,
     );
+    // Guardar datos de usuario en SharedPreferences si login exitoso
+    if (result.success && result.user != null) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('username', result.user?.displayName ?? 'Usuario');
+      await prefs.setString('email', result.user?.email ?? 'Sin correo');
+      await prefs.setString('fechaRegistro', result.user?.metadata.creationTime?.toIso8601String() ?? 'Sin fecha');
+    }
 
     if (result.success) {
       _showMessage('¡Inicio de sesión exitoso!');

@@ -108,9 +108,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: _passwordController.text,
         username: _usernameController.text,
       );
+      // Guardar datos ingresados en SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('username', _usernameController.text);
+      await prefs.setString('email', _emailController.text);
+      await prefs.setString('fechaRegistro', DateTime.now().toIso8601String());
       // Verificar versión de API y sincronizar si es nueva
       try {
-        final prefs = await SharedPreferences.getInstance();
         final response = await http.get(
           Uri.parse(
             'https://devtionary-api-production.up.railway.app/api/user/health',
