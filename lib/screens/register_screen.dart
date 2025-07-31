@@ -143,6 +143,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       } catch (e) {
         print('Error al verificar versión y sincronizar: $e');
       }
+      // Navegar automáticamente al menú principal
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/main_menu');
+      }
     } catch (e) {
       setState(() {
         _coordinator.uiState.setLoading(false);
@@ -153,6 +157,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _handleGoogleSignIn() async {
     await _coordinator.handleGoogleRegister();
+    // Navegar automáticamente al menú principal después de registro con Google
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/main_menu');
+    }
   }
 
   /*
