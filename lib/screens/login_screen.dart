@@ -108,15 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => RegisterScreen()),
-    ).then((_) async {
-      // Sincronizar términos después de registro
-      await TerminosRepository().sincronizarTerminos();
-      await ComandosRepository().sincronizarComandos();
-      await InstruccionesRepository().sincronizarInstrucciones();
-      await PreguntasRepository().sincronizarPreguntas();
-      await SubcategoriasRepository().sincronizarSubcategorias();
-      
-    });
+    );
   }
 
   // Manejar el inicio de sesión con email y contraseña
@@ -178,7 +170,8 @@ class _LoginScreenState extends State<LoginScreen> {
             await prefs.setString('api_version', apiVersion);
             print('Sincronización realizada por nueva versión: $apiVersion');
           } else {
-            print('Versión actual ($apiVersion) ya sincronizada.');
+            // No sincronizar si la versión es igual
+            print('Versión actual ($apiVersion) ya sincronizada. No se realiza sincronización.');
           }
         } else {
           print('No se pudo obtener la versión de la API.');
