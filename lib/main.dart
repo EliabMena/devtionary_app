@@ -1,5 +1,6 @@
 import 'package:devtionary_app/screens/favoritos_screen.dart';
 import 'package:devtionary_app/screens/main_menu.dart';
+import 'package:devtionary_app/screens/perfil_screen.dart';
 import 'package:devtionary_app/screens/register_screen.dart';
 import 'package:devtionary_app/screens/login_screen.dart';
 import 'package:devtionary_app/screens/search_screen.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         '/targetas': (context) => WordCardsScreen(),
         '/SearchScreen': (context) => SearchScreen(),
         '/favoritos': (context) => FavoritosScreen(),
+        '/perfil': (context) => PerfilScreen(),
       },
     );
   }

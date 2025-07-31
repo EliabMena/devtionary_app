@@ -23,7 +23,7 @@ class CustomBottomNavBar extends StatelessWidget {
     '/SearchScreen',
     '/main_menu',
     null, // Quizzes
-    null, // Perfil
+    '/perfil',
   ];
 
   const CustomBottomNavBar({
