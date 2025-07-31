@@ -17,7 +17,9 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     if (token == null) return;
-    final url = Uri.parse('https://devtionary-api-production.up.railway.app/api/user');
+    final url = Uri.parse(
+      'https://devtionary-api-production.up.railway.app/api/user',
+    );
     try {
       final response = await http.delete(
         url,
@@ -52,6 +54,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
       );
     }
   }
+
   // Para mostrar el subtitle dinámico
   Future<String> obtenerDescripcion(String nombre) async {
     final resultado = await DatabaseHelper.buscarPorNombre(nombre);
@@ -177,12 +180,6 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  print('Botón de TEST presionado');
-                },
-                child: const Text('TEST'),
-              ),
               const SizedBox(height: 24),
               // Logo
               Image.asset('assets/imagenes/logo.png', height: 60),
@@ -278,140 +275,114 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
                       child: isLoading
                           ? const Center(child: CircularProgressIndicator())
                           : filteredFavoritos.isEmpty
-                              ? const Center(
-                                  child: Text(
-                                    'No tienes favoritos aún.',
-                                    style: TextStyle(color: Colors.white70, fontSize: 18),
-                                  ),
-                                )
-                              : ListView.builder(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  itemCount: filteredFavoritos.length,
-                                  itemBuilder: (context, index) {
-                                    final fav = filteredFavoritos[index];
-                                    return FutureBuilder<String>(
-                                      future: obtenerDescripcion(fav),
-                                      builder: (context, snapshot) {
-                                        final descripcion =
-                                            (snapshot.hasData && snapshot.data != null)
-                                                ? snapshot.data!
-                                                : '';
-                                        return Container(
-                                          margin: const EdgeInsets.only(bottom: 12),
+                          ? const Center(
+                              child: Text(
+                                'No tienes favoritos aún.',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            )
+                          : ListView.builder(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              itemCount: filteredFavoritos.length,
+                              itemBuilder: (context, index) {
+                                final fav = filteredFavoritos[index];
+                                return FutureBuilder<String>(
+                                  future: obtenerDescripcion(fav),
+                                  builder: (context, snapshot) {
+                                    final descripcion =
+                                        (snapshot.hasData &&
+                                            snapshot.data != null)
+                                        ? snapshot.data!
+                                        : '';
+                                    return Container(
+                                      margin: const EdgeInsets.only(bottom: 12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.7),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                          color: Colors.tealAccent,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      child: ListTile(
+                                        onTap: () async {
+                                          final resultado =
+                                              await DatabaseHelper.buscarPorNombre(
+                                                fav,
+                                              );
+                                          if (resultado != null) {
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/targetas',
+                                              arguments: resultado,
+                                            );
+                                          }
+                                        },
+                                        leading: Container(
+                                          width: 48,
+                                          height: 48,
                                           decoration: BoxDecoration(
-                                            color: Colors.black.withOpacity(0.7),
-                                            borderRadius: BorderRadius.circular(16),
-                                            border: Border.all(
-                                              color: Colors.tealAccent,
-                                              width: 2,
+                                            color: const Color.fromARGB(
+                                              0,
+                                              66,
+                                              66,
+                                              66,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
                                             ),
                                           ),
-                                          child: ListTile(
-                                            onTap: () async {
-                                              final resultado =
-                                                  await DatabaseHelper.buscarPorNombre(
-                                                    fav,
-                                                  );
-                                              if (resultado != null) {
-                                                Navigator.pushNamed(
-                                                  context,
-                                                  '/targetas',
-                                                  arguments: resultado,
-                                                );
-                                              }
-                                            },
-                                            leading: Container(
-                                              width: 48,
-                                              height: 48,
-                                              decoration: BoxDecoration(
-                                                color: const Color.fromARGB(
-                                                  0,
-                                                  66,
-                                                  66,
-                                                  66,
-                                                ),
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              child: const Icon(
-                                                Icons.favorite,
-                                                color: Color.fromARGB(255, 212, 111, 111),
-                                                size: 28,
-                                              ),
+                                          child: const Icon(
+                                            Icons.favorite,
+                                            color: Color.fromARGB(
+                                              255,
+                                              212,
+                                              111,
+                                              111,
                                             ),
-                                            title: Text(
-                                              fav,
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 18,
-                                              ),
-                                            ),
-                                            subtitle: Text(
-                                              descripcion,
-                                              style: const TextStyle(
-                                                color: Colors.white70,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                            trailing: IconButton(
-                                              icon: const Icon(
-                                                Icons.close,
-                                                color: Colors.redAccent,
-                                              ),
-                                              tooltip: 'Eliminar favorito',
-                                              onPressed: () async {
-                                                await deleteFavorito(fav);
-                                              },
-                                            ),
+                                            size: 28,
                                           ),
-                                        );
-                                      },
+                                        ),
+                                        title: Text(
+                                          fav,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          descripcion,
+                                          style: const TextStyle(
+                                            color: Colors.white70,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        trailing: IconButton(
+                                          icon: const Icon(
+                                            Icons.close,
+                                            color: Colors.redAccent,
+                                          ),
+                                          tooltip: 'Eliminar favorito',
+                                          onPressed: () async {
+                                            await deleteFavorito(fav);
+                                          },
+                                        ),
+                                      ),
                                     );
                                   },
-                                ),
+                                );
+                              },
+                            ),
                     ),
                     const SizedBox(height: 16),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      icon: const Icon(Icons.delete_forever),
-                      label: const Text('Eliminar cuenta'),
-                      onPressed: () async {
-                        print('Botón Eliminar cuenta presionado');
-                        // Confirmación antes de eliminar
-                        final confirm = await showDialog<bool>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('¿Eliminar cuenta?'),
-                            content: const Text('Esta acción no se puede deshacer. ¿Estás seguro?'),
-                            actions: [
-                              TextButton(
-                                child: const Text('Cancelar'),
-                                onPressed: () => Navigator.pop(context, false),
-                              ),
-                              TextButton(
-                                child: const Text('Eliminar'),
-                                onPressed: () => Navigator.pop(context, true),
-                              ),
-                            ],
-                          ),
-                        );
-                        print('Valor de confirm: $confirm');
-                        if (confirm == true) {
-                          print('Eliminando usuario...');
-                          await eliminarUsuario();
-                        }
-                      },
-                    ),
+                    // Botón de eliminar cuenta eliminado
                   ],
                 ),
               ),
