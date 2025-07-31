@@ -150,7 +150,8 @@ class MainMenu extends StatelessWidget {
                 }
                 final subcategorias = snapshot.data!;
                 return SizedBox(
-                  height: 140,
+                  width: 230,
+                  height: 230,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -347,6 +348,7 @@ class MainMenu extends StatelessWidget {
                       }),
                     ),
                   ),
+
                 );
               },
             ),

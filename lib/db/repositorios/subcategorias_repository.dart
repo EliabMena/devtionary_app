@@ -158,4 +158,17 @@ class SubcategoriasRepository {
       return Subcategorias.fromJson(maps[i]);
     });
   }
+
+  Future<List<Subcategorias>> getSubcategoriasByCategoryId(int id_categoria) async {
+    final db = await DatabaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'subcategorias',
+      where: 'id_categoria = ?',
+      whereArgs: [id_categoria],
+    );
+
+    return List.generate(maps.length, (i) {
+      return Subcategorias.fromJson(maps[i]);
+    });
+  }
 }

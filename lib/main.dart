@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       title: 'Devtionary App',
       theme: ThemeData.dark(),
       themeMode: ThemeMode.system,
-      initialRoute: '/register',
+      initialRoute: '/main_menu',
       routes: {
         '/register': (context) => RegisterScreen(),
         '/login': (context) => LoginScreen(),

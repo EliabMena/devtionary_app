@@ -16,7 +16,6 @@ class TarjetaCategoria extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: gradient,
@@ -25,12 +24,11 @@ class TarjetaCategoria extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(16),
       ),
-      padding: EdgeInsets.symmetric(vertical: 24),
       child: Column(mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 154,
+            height: 154,
             decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               borderRadius: BorderRadius.circular(12),
