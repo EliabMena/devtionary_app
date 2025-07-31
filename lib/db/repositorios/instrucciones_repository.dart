@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../db_models/instrucciones.dart';
-import '../database_helper.dart';
+import 'package:devtionary_app/db/db_models/instrucciones.dart';
+import 'package:devtionary_app/db/database_helper.dart';
 
 class InstruccionesRepository {
   static const String _baseUrl =

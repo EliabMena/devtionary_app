@@ -2,9 +2,12 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'repositorios/comandos_repository.dart';
-import 'repositorios/terminos_repository.dart';
-import 'repositorios/instrucciones_repository.dart';
+import 'package:devtionary_app/db/repositorios/comandos_repository.dart';
+import 'package:devtionary_app/db/repositorios/terminos_repository.dart';
+import 'package:devtionary_app/db/repositorios/instrucciones_repository.dart';
+import 'package:devtionary_app/db/repositorios/preguntas_repository.dart';
+import 'package:devtionary_app/db/repositorios/subcategorias_repository.dart';
+import 'package:devtionary_app/db/repositorios/categorias_repository.dart';
 
 class DatabaseHelper {
   // Buscar palabra por nombre en terminos, comandos e instrucciones
@@ -39,6 +42,38 @@ class DatabaseHelper {
     return null;
   }
 
+  // Método para sincronizar todos los datos
+  static Future<void> sincronizarDatos() async {
+    CategoriasRepository CatRepo = CategoriasRepository();
+    SubcategoriasRepository SubCatRepo = SubcategoriasRepository();
+    TerminosRepository TermRepo = TerminosRepository();
+    ComandosRepository ComRepo = ComandosRepository();
+    InstruccionesRepository InstruRepo = InstruccionesRepository();
+    PreguntasRepository PregRepo = PreguntasRepository();
+    try {
+      // Sincronizar categorías
+      print('Sincronizando categorías...');
+      await CatRepo.sincronizarCategorias();
+      // Sincronizar subcategorías
+      print('Sincronizando subcategorías...');
+      await SubCatRepo.sincronizarSubcategorias();
+      // Sincronizar términos
+      print('Sincronizando términos...');
+      await TermRepo.sincronizarTerminos();
+      // Sincronizar comandos
+      print('Sincronizando comandos...');
+      await ComRepo.sincronizarComandos();
+      // Sincronizar instrucciones
+      print('Sincronizando instrucciones...');
+      await InstruRepo.sincronizarInstrucciones();
+      // Sincronizar preguntas
+      print('Sincronizando preguntas...');
+      await PregRepo.sincronizarPreguntas();
+    } catch (e) {
+      throw Exception('Error durante la sincronización: $e');
+    }
+  }
+
   static Database? _database;
 
   // Obtener la base de datos (singleton)
@@ -55,7 +90,7 @@ class DatabaseHelper {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, fileName);
 
-    return await openDatabase(path, version: 2, onCreate: _createDB);
+    return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
   // Crear las tablas
@@ -122,7 +157,6 @@ class DatabaseHelper {
           FOREIGN KEY (id_subcategoria) REFERENCES subcategorias(id_subcategoria)
           )
       ''');
-
       await txn.execute('''
         CREATE TABLE IF NOT EXISTS preguntas (
           id_pregunta INTEGER PRIMARY KEY,

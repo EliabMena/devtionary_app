@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../db_models/subcategorias.dart';
-import '../database_helper.dart';
+import 'package:devtionary_app/db/db_models/subcategorias.dart';
+import 'package:devtionary_app/db/database_helper.dart';
 
 class SubcategoriasRepository {
   static const String _baseUrl =

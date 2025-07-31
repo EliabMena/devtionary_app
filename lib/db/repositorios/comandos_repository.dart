@@ -55,7 +55,6 @@ class ComandosRepository {
       if (comandosLocales.isEmpty) {
         // Situación 1: La tabla está vacía - insertar todos los comandos de la API
         await _insertarTodosLosComandos(comandosAPI);
-        print('${comandosAPI.length} comandos insertados desde la API');
       } else {
         // Situación 2 y 3: Comparar y sincronizar
         await _compararYSincronizar(comandosLocales, comandosAPI);
