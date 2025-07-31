@@ -336,6 +336,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.16.0"
+  modern_launcher_name:
+    dependency: "direct main"
+    description:
+      name: modern_launcher_name
+      sha256: b42c9c489e5bb84b0a3f76d5a23ad3336d9d759e6510bfff893c98e22318fe1e
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   path:
     dependency: "direct main"
     description:
