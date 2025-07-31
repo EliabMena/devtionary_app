@@ -55,14 +55,12 @@ class CategoriasRepository {
       if (categoriasLocales.isEmpty) {
         // Situación 1: La tabla está vacía - insertar todas las categorías de la API
         await _insertarTodasLasCategorias(categoriasAPI);
-        print('${categoriasAPI.length} categorías insertadas desde la API');
       } else {
         // Situación 2 y 3: Comparar y sincronizar
         await _compararYSincronizar(categoriasLocales, categoriasAPI);
       }
 
       // Paso 3: La conexión se cierra automáticamente
-      print('Sincronización de categorías completada');
     } catch (e) {
       throw Exception('Error durante la sincronización: $e');
     }
@@ -99,9 +97,6 @@ class CategoriasRepository {
       for (var cat in locales) cat.id_categoria: cat,
     };
 
-    int actualizadas = 0;
-    int insertadas = 0;
-
     // Revisar categorías de la API
     for (Categorias categoriaAPI in api) {
       Categorias? categoriaLocal = localesMap[categoriaAPI.id_categoria];
@@ -109,7 +104,6 @@ class CategoriasRepository {
       if (categoriaLocal == null) {
         // Situación 3: Nueva categoría en la API - insertarla
         await db.insert('categorias', categoriaAPI.toJson());
-        insertadas++;
       } else if (categoriaLocal.fechaActualizacion !=
           categoriaAPI.fechaActualizacion) {
         // Situación 2.2: Fechas diferentes - actualizar
@@ -119,14 +113,9 @@ class CategoriasRepository {
           where: 'id_categoria = ?',
           whereArgs: [categoriaAPI.id_categoria],
         );
-        actualizadas++;
       }
       // Situación 2.1: Fechas iguales - no hacer nada
     }
-
-    print(
-      'Sincronización completada: $insertadas insertadas, $actualizadas actualizadas',
-    );
   }
 
   String _getErrorMessage(int statusCode) {
