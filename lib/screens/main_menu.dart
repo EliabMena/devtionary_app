@@ -10,12 +10,16 @@ import 'package:devtionary_app/db/repositorios/subcategorias_repository.dart';
 
 class MainMenu extends StatelessWidget {
   void logSubcategoriasLocales() async {
-    final subcategorias = await SubcategoriasRepository().fetchSubcategorias();
+    final subcategorias = await SubcategoriasRepository()
+        .fetchSubcategorias(); //Esto está llamando a la API constantemente, haciendo que crashee. Utiliza mejor el que llama a los datos de la bd local
     print('Subcategorias locales:');
     for (var sub in subcategorias) {
-      print('id: ${sub.id_subcategoria}, nombre: ${sub.nombre}, fecha_creacion: ${sub.fecha_creacion}, fecha_actualizacion: ${sub.fecha_actualizacion}');
+      print(
+        'id: ${sub.id_subcategoria}, nombre: ${sub.nombre}, fecha_creacion: ${sub.fecha_creacion}, fecha_actualizacion: ${sub.fecha_actualizacion}',
+      );
     }
   }
+
   const MainMenu({super.key});
 
   Future<List<String>> obtenerRecientes() async {
@@ -108,7 +112,9 @@ class MainMenu extends StatelessWidget {
                           ),
                         ),
                         onTap: () async {
-                          final info = await obtenerInfoPalabra(recientes[index]);
+                          final info = await obtenerInfoPalabra(
+                            recientes[index],
+                          );
                           if (info != null) {
                             Navigator.pushNamed(
                               context,
@@ -135,7 +141,9 @@ class MainMenu extends StatelessWidget {
             ),
             SizedBox(height: 12),
             FutureBuilder<List<Subcategorias>>(
-              future: SubcategoriasRepository().fetchSubcategorias(),
+              future: SubcategoriasRepository()
+                  .fetchSubcategorias(), // Más de lo mismo, llamas a la API constantemente, lo que puede causar problemas de rendimiento
+              // Puedes cambiar esto para que use la base de datos local si necesitas los datos, así evitas que la api muera
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
@@ -260,7 +268,7 @@ class MainMenu extends StatelessWidget {
                             break;
                           case '10':
                             gradient = [Color(0xFF005BEA), Color(0xFF00C6FB)];
-                            iconWidget = Text(  
+                            iconWidget = Text(
                               'Python',
                               style: TextStyle(
                                 color: Colors.yellow,
@@ -359,7 +367,10 @@ class MainMenu extends StatelessWidget {
         onTap: (index) {
           switch (index) {
             case 0:
-              Navigator.pushNamed(context, '');//falta implementación de la pantalla de favoritos
+              Navigator.pushNamed(
+                context,
+                '',
+              ); //falta implementación de la pantalla de favoritos
               break;
             case 1:
               Navigator.pushNamed(context, '/search');
@@ -368,10 +379,16 @@ class MainMenu extends StatelessWidget {
               Navigator.pushNamed(context, '/main_menu');
               break;
             case 3:
-              Navigator.pushNamed(context, '');//falta implementación de la pantalla de quizzes
+              Navigator.pushNamed(
+                context,
+                '',
+              ); //falta implementación de la pantalla de quizzes
               break;
             case 4:
-              Navigator.pushNamed(context, '/perfil'); //falta implementación de la pantalla de perfil
+              Navigator.pushNamed(
+                context,
+                '/perfil',
+              ); //falta implementación de la pantalla de perfil
               break;
           }
         },
