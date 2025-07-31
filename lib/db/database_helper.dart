@@ -4,6 +4,39 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 class DatabaseHelper {
+  // Buscar palabra por nombre en terminos, comandos e instrucciones
+  static Future<Map<String, dynamic>?> buscarPorNombre(String nombre) async {
+    final db = await database;
+    // Buscar en terminos
+    final terminos = await db.query(
+      'terminos',
+      where: 'nombre_termino = ?',
+      whereArgs: [nombre],
+    );
+    if (terminos.isNotEmpty) {
+      return {'tabla': 'terminos', ...terminos.first};
+    }
+    // Buscar en comandos
+    final comandos = await db.query(
+      'comandos',
+      where: 'nombre_comando = ?',
+      whereArgs: [nombre],
+    );
+    if (comandos.isNotEmpty) {
+      return {'tabla': 'comandos', ...comandos.first};
+    }
+    // Buscar en instrucciones
+    final instrucciones = await db.query(
+      'instrucciones',
+      where: 'nombre_instruccion = ?',
+      whereArgs: [nombre],
+    );
+    if (instrucciones.isNotEmpty) {
+      return {'tabla': 'instrucciones', ...instrucciones.first};
+    }
+    return null;
+  }
+
   static Database? _database;
 
   // Obtener la base de datos (singleton)

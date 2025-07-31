@@ -5,10 +5,11 @@ import 'package:devtionary_app/widgets/searchbar.dart';
 import 'package:devtionary_app/widgets/nav_button.dart';
 import 'package:devtionary_app/widgets/searchbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class WordCardsScreen extends StatefulWidget {
-  final Map<String, dynamic>? wordData;
-  const WordCardsScreen({Key? key, this.wordData}) : super(key: key);
+  const WordCardsScreen({Key? key}) : super(key: key);
   @override
   _WordCardsScreenState createState() => _WordCardsScreenState();
 }
@@ -28,14 +29,93 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
   // Controlador para la barra de búsqueda
   final TextEditingController _searchController = TextEditingController();
 
-  // Datos de la palabra de forma temporal
   late Map<String, dynamic> wordData;
 
+  // --- FAVORITOS API ---
+  Future<String?> _getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
+  }
+
+  Future<bool> addFavorite(String termino) async {
+    final token = await _getToken();
+    print('[addFavorite] token: $token');
+    if (token == null) {
+      print('[addFavorite] No token found');
+      return false;
+    }
+    final url = Uri.parse(
+      'https://devtionary-api-production.up.railway.app/api/user/favoritos',
+    );
+    print('[addFavorite] url: $url');
+    final body = jsonEncode({'termino': termino});
+    print('[addFavorite] body: $body');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+      print('[addFavorite] statusCode: ${response.statusCode}');
+      print('[addFavorite] response.body: ${response.body}');
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      print('[addFavorite] error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> removeFavorite(String termino) async {
+    final token = await _getToken();
+    print('[removeFavorite] token: $token');
+    if (token == null) {
+      print('[removeFavorite] No token found');
+      return false;
+    }
+    final url = Uri.parse(
+      'https://devtionary-api-production.up.railway.app/api/user/favoritos',
+    );
+    print('[removeFavorite] url: $url');
+    final body = jsonEncode({'termino': termino});
+    print('[removeFavorite] body: $body');
+    try {
+      final response = await http.delete(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+      print('[removeFavorite] statusCode: ${response.statusCode}');
+      print('[removeFavorite] response.body: ${response.body}');
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (e) {
+      print('[removeFavorite] error: $e');
+      return false;
+    }
+  }
+
   @override
-  void initState() {
-    super.initState();
-    if (widget.wordData != null) {
-      wordData = widget.wordData!;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args != null && args is Map<String, dynamic>) {
+      // Mapear los campos esperados desde la base de datos
+      wordData = {
+        'word':
+            args['nombre_termino'] ??
+            args['nombre_comando'] ??
+            args['nombre_instruccion'] ??
+            'Palabra',
+        'subtitle': args['tabla'] ?? 'Desconocido',
+        'description': args['descripcion']?.toString() ?? '',
+        'isFavorite': false,
+        ...args,
+      };
     } else {
       wordData = {
         'word': 'Palabra',
@@ -50,25 +130,27 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // FONDO CON DEGRADADO
-      body: Container(
-        decoration: const BoxDecoration(
+      body: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        width: double.infinity,
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
           gradient: RadialGradient(
-            center: Alignment(-1.0, 0.4),
-            radius: 0.4,
             colors: [
-              Color.fromARGB(255, 1, 84, 95),
-              Color.fromARGB(255, 8, 71, 29),
-              Color.fromARGB(255, 5, 41, 17),
-              Color.fromARGB(255, 1, 8, 3),
+              primaryGradientColor,
+              secondaryGradientColor,
+              Colors.black,
             ],
-            stops: [0.0, 0.3, 0.6, 1.0], // Distribución de colores
+            stops: [0.2, 0.4, 0.7],
+            center: Alignment.centerLeft,
+            radius: MediaQuery.of(context).viewInsets.bottom > 0 ? 1 : 1.6,
           ),
         ),
         child: SafeArea(
           child: Column(
             children: [
-              // ===== APP BAR PERSONALIZADO CON BARRA DE BÚSQUEDA =====
+              // ===== APP BAR SOLO CON BOTÓN DE REGRESO =====
               Container(
                 padding: const EdgeInsets.only(
                   left: 16,
@@ -85,20 +167,6 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
                           context,
                         ); // Regresar a la pantalla anterior
                       },
-                    ),
-                    Expanded(
-                      child: CustomSearchBar(
-                        controller: _searchController,
-                        hintText: 'Buscar término',
-                        onChanged: (value) {
-                          // implementar la lógica de búsqueda
-                          print('Buscando: $value');
-                        },
-                        onSubmitted: (value) {
-                          // Cuando el usuario presiona Enter
-                          print('Búsqueda enviada: $value');
-                        },
-                      ),
                     ),
                   ],
                 ),
@@ -135,7 +203,7 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
   Widget _buildWordCard() {
     return GestureDetector(
       onTap: () {
-        guardarActividadReciente(wordData as String);
+        guardarActividadReciente(wordData['word']);
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 20),
@@ -297,10 +365,25 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          wordData['isFavorite'] = !wordData['isFavorite'];
-                        });
+                      onTap: () async {
+                        bool success = false;
+                        if (!wordData['isFavorite']) {
+                          success = await addFavorite(wordData['word']);
+                        } else {
+                          success = await removeFavorite(wordData['word']);
+                        }
+                        if (success) {
+                          setState(() {
+                            wordData['isFavorite'] = !wordData['isFavorite'];
+                          });
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error al actualizar favorito'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       },
                       child: Container(
                         padding: const EdgeInsets.all(8),

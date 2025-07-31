@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../models/service_result.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -19,6 +20,12 @@ class AuthService {
       UserCredential userCredential = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
 
+      // Guardar token en SharedPreferences
+      String? token = await userCredential.user?.getIdToken();
+      if (token != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token);
+      }
       // Retornar resultado exitoso
       return ServiceResult.success(
         userCredential.user!,
@@ -48,6 +55,12 @@ class AuthService {
       UserCredential userCredential = await _firebaseAuth
           .signInWithEmailAndPassword(email: emailClean, password: password);
 
+      // Guardar token en SharedPreferences
+      String? token = await userCredential.user?.getIdToken();
+      if (token != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token);
+      }
       // Retornar resultado exitoso
       return ServiceResult.success(
         userCredential.user!,
@@ -91,6 +104,12 @@ class AuthService {
         credential,
       );
 
+      // Guardar token en SharedPreferences
+      String? token = await userCredential.user?.getIdToken();
+      if (token != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token);
+      }
       // Retornar resultado exitoso
       return ServiceResult.success(
         userCredential.user!,

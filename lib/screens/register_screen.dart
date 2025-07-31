@@ -2,6 +2,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:devtionary_app/db/repositorios/terminos_repository.dart';
+import 'package:devtionary_app/db/repositorios/comandos_repository.dart';
+import 'package:devtionary_app/db/repositorios/instrucciones_repository.dart';
 import 'package:devtionary_app/Utility/thems/app_colors.dart';
 import 'package:devtionary_app/Utility/coordinators/register_coordinator.dart';
 import 'package:devtionary_app/Utility/helpers/scroll_helper.dart';
@@ -120,6 +122,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           final localVersion = prefs.getString('api_version') ?? '';
           if (apiVersion != localVersion) {
             await TerminosRepository().sincronizarTerminos();
+            await ComandosRepository().sincronizarComandos();
+            await InstruccionesRepository().sincronizarInstrucciones();
             await prefs.setString('api_version', apiVersion);
             print('Sincronización realizada por nueva versión: $apiVersion');
           } else {
