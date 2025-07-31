@@ -111,6 +111,11 @@ class _LoginScreenState extends State<LoginScreen> {
     ).then((_) async {
       // Sincronizar términos después de registro
       await TerminosRepository().sincronizarTerminos();
+      await ComandosRepository().sincronizarComandos();
+      await InstruccionesRepository().sincronizarInstrucciones();
+      await PreguntasRepository().sincronizarPreguntas();
+      await SubcategoriasRepository().sincronizarSubcategorias();
+      
     });
   }
 

@@ -38,7 +38,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 );
                 final body = {'password': contrasenaController.text};
                 try {
-                  final response = await http.post(
+                  final response = await http.patch(
                     url,
                     headers: {
                       'Authorization': 'Bearer $token',
@@ -115,7 +115,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   'email': correoController.text,
                 };
                 try {
-                  final response = await http.post(
+                  final response = await http.patch(
                     url,
                     headers: {
                       'Authorization': 'Bearer $token',
