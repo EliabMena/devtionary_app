@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../db_models/terminos.dart';
-import '../database_helper.dart';
+import 'package:devtionary_app/db/db_models/terminos.dart';
+import 'package:devtionary_app/db/database_helper.dart';
 
 class TerminosRepository {
   static const String _baseUrl =

@@ -1,5 +1,3 @@
-import 'package:devtionary_app/db/db_models/preguntas.dart';
-import 'package:devtionary_app/db/db_models/subcategorias.dart';
 import 'package:devtionary_app/db/repositorios/preguntas_repository.dart';
 import 'package:devtionary_app/db/repositorios/subcategorias_repository.dart';
 import 'package:http/http.dart' as http;
@@ -15,6 +13,7 @@ import 'package:devtionary_app/services/auth_service.dart';
 import 'package:devtionary_app/db/repositorios/terminos_repository.dart';
 import 'package:devtionary_app/db/repositorios/comandos_repository.dart';
 import 'package:devtionary_app/db/repositorios/instrucciones_repository.dart';
+import 'package:devtionary_app/db/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 
@@ -144,7 +143,10 @@ class _LoginScreenState extends State<LoginScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('username', result.user?.displayName ?? 'Usuario');
       await prefs.setString('email', result.user?.email ?? 'Sin correo');
-      await prefs.setString('fechaRegistro', result.user?.metadata.creationTime?.toIso8601String() ?? 'Sin fecha');
+      await prefs.setString(
+        'fechaRegistro',
+        result.user?.metadata.creationTime?.toIso8601String() ?? 'Sin fecha',
+      );
     }
 
     if (result.success) {
@@ -162,16 +164,14 @@ class _LoginScreenState extends State<LoginScreen> {
           final apiVersion = data['version'] ?? '';
           final localVersion = prefs.getString('api_version') ?? '';
           if (apiVersion != localVersion) {
-            await TerminosRepository().sincronizarTerminos();
-            await ComandosRepository().sincronizarComandos();
-            await InstruccionesRepository().sincronizarInstrucciones();
-            await PreguntasRepository().sincronizarPreguntas();
-            await SubcategoriasRepository().sincronizarSubcategorias();
+            await DatabaseHelper.sincronizarDatos();
             await prefs.setString('api_version', apiVersion);
             print('Sincronización realizada por nueva versión: $apiVersion');
           } else {
             // No sincronizar si la versión es igual
-            print('Versión actual ($apiVersion) ya sincronizada. No se realiza sincronización.');
+            print(
+              'Versión actual ($apiVersion) ya sincronizada. No se realiza sincronización.',
+            );
           }
         } else {
           print('No se pudo obtener la versión de la API.');
@@ -194,6 +194,17 @@ class _LoginScreenState extends State<LoginScreen> {
       print('--- CONTENIDO DE INSTRUCCIONES ---');
       for (var i in instrucciones) {
         print(i.toJson());
+      }
+      final preguntas = await PreguntasRepository().getPreguntas();
+      print('--- CONTENIDO DE PREGUNTAS ---');
+      for (var p in preguntas) {
+        print(p.toJson());
+      }
+      final subcategorias = await SubcategoriasRepository()
+          .getSubcategoriasLocales();
+      print('--- CONTENIDO DE SUBCATEGORIAS ---');
+      for (var s in subcategorias) {
+        print(s.toJson());
       }
       Navigator.pushReplacementNamed(context, '/SearchScreen');
     } else {
@@ -234,12 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
           if (apiVersion != localVersion) {
             print('Sincronizando datos por nueva versión: $apiVersion');
             try {
-              print('Sincronizando términos...');
-              await TerminosRepository().sincronizarTerminos();
-              print('Sincronizando comandos...');
-              await ComandosRepository().sincronizarComandos();
-              print('Sincronizando instrucciones...');
-              await InstruccionesRepository().sincronizarInstrucciones();
+              await DatabaseHelper.sincronizarDatos();
               await prefs.setString('api_version', apiVersion);
             } catch (e) {
               print('Error al sincronizar datos: $e');

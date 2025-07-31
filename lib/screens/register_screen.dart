@@ -1,11 +1,6 @@
-import 'package:devtionary_app/db/repositorios/preguntas_repository.dart';
-import 'package:devtionary_app/db/repositorios/subcategorias_repository.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:devtionary_app/db/repositorios/terminos_repository.dart';
-import 'package:devtionary_app/db/repositorios/comandos_repository.dart';
-import 'package:devtionary_app/db/repositorios/instrucciones_repository.dart';
 import 'package:devtionary_app/Utility/thems/app_colors.dart';
 import 'package:devtionary_app/Utility/coordinators/register_coordinator.dart';
 import 'package:devtionary_app/Utility/helpers/scroll_helper.dart';
@@ -13,6 +8,7 @@ import 'package:devtionary_app/widgets/text_input.dart';
 import 'package:devtionary_app/widgets/btn_basic.dart';
 import 'package:devtionary_app/widgets/btn_google.dart';
 import 'package:flutter/material.dart';
+import 'package:devtionary_app/db/database_helper.dart';
 import 'package:flutter/gestures.dart';
 
 /*
@@ -127,11 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           final apiVersion = data['version'] ?? '';
           final localVersion = prefs.getString('api_version') ?? '';
           if (apiVersion != localVersion) {
-            await TerminosRepository().sincronizarTerminos();
-            await ComandosRepository().sincronizarComandos();
-            await InstruccionesRepository().sincronizarInstrucciones();
-            await PreguntasRepository().sincronizarPreguntas();
-            await SubcategoriasRepository().sincronizarSubcategorias();
+            await DatabaseHelper.sincronizarDatos();
             await prefs.setString('api_version', apiVersion);
             print('Sincronización realizada por nueva versión: $apiVersion');
           } else {
