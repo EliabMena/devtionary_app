@@ -124,7 +124,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           // Actualiza la búsqueda en tiempo real si lo deseas
                         },
                         onSubmitted: (value) {
-                          _searchAdvanced(value);
+                          _searchAdvanced(value, ""); // Aquí we
                         },
                       ),
                     ),
