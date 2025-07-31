@@ -110,12 +110,10 @@ class MainMenu extends StatelessWidget {
                         onTap: () async {
                           final info = await obtenerInfoPalabra(recientes[index]);
                           if (info != null) {
-                            Navigator.push(
+                            Navigator.pushNamed(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    WordCardsScreen(wordData: info),
-                              ),
+                              '/targetas',
+                              arguments: info,
                             );
                           }
                         },
