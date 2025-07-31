@@ -55,14 +55,12 @@ class PreguntasRepository {
       if (preguntasLocales.isEmpty) {
         // Situación 1: La tabla está vacía - insertar todas las preguntas de la API
         await _insertarTodasLasPreguntas(preguntasAPI);
-        print('${preguntasAPI.length} preguntas insertadas desde la API');
       } else {
         // Situación 2 y 3: Comparar y sincronizar
         await _compararYSincronizar(preguntasLocales, preguntasAPI);
       }
 
       // Paso 3: La conexión se cierra automáticamente
-      print('Sincronización de preguntas completada');
     } catch (e) {
       throw Exception('Error durante la sincronización: $e');
     }
@@ -99,9 +97,6 @@ class PreguntasRepository {
       for (var pregunta in locales) pregunta.id_pregunta: pregunta,
     };
 
-    int actualizadas = 0;
-    int insertadas = 0;
-
     // Revisar preguntas de la API
     for (Preguntas preguntaAPI in api) {
       Preguntas? preguntaLocal = localesMap[preguntaAPI.id_pregunta];
@@ -109,7 +104,6 @@ class PreguntasRepository {
       if (preguntaLocal == null) {
         // Situación 3: Nueva pregunta en la API - insertarla
         await db.insert('preguntas', preguntaAPI.toJson());
-        insertadas++;
       } else if (preguntaLocal.fecha_actualizacion !=
           preguntaAPI.fecha_actualizacion) {
         // Situación 2.2: Fechas diferentes - actualizar
@@ -119,14 +113,9 @@ class PreguntasRepository {
           where: 'id_pregunta = ?',
           whereArgs: [preguntaAPI.id_pregunta],
         );
-        actualizadas++;
       }
       // Situación 2.1: Fechas iguales - no hacer nada
     }
-
-    print(
-      'Sincronización completada: $insertadas insertadas, $actualizadas actualizadas',
-    );
   }
 
   // Método para obtener todas las preguntas
@@ -176,28 +165,6 @@ class PreguntasRepository {
       LIMIT 10
     ''',
       [nombreCategoria],
-    );
-
-    return List.generate(maps.length, (i) {
-      return Preguntas.fromJson(maps[i]);
-    });
-  }
-
-  // Método para obtener preguntas aleatorias por subcategoría
-  Future<List<Preguntas>> getPreguntasAleatoriasPorSubcategoria(
-    int idSubcategoria,
-    int cantidad,
-  ) async {
-    final db = await DatabaseHelper.database;
-
-    final List<Map<String, dynamic>> maps = await db.rawQuery(
-      '''
-      SELECT * FROM preguntas 
-      WHERE id_subcategoria = ? 
-      ORDER BY RANDOM() 
-      LIMIT ?
-    ''',
-      [idSubcategoria, cantidad],
     );
 
     return List.generate(maps.length, (i) {
