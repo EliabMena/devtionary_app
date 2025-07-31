@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:devtionary_app/Utility/thems/app_colors.dart';
 
 class ResultadoCard extends StatelessWidget {
   final String titulo;
   final String subtitulo;
-  final List<IconData>? icons;
+  final int? idSubcategoria;
   final VoidCallback? onTap;
 
   const ResultadoCard({
     Key? key,
     required this.titulo,
     required this.subtitulo,
-    this.icons,
+    this.idSubcategoria,
     this.onTap,
   }) : super(key: key);
 
@@ -22,8 +23,8 @@ class ResultadoCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          gradient: const LinearGradient(
-            colors: [Color(0xFF00C6FB), Color(0xFF43E97B)],
+          gradient: LinearGradient(
+            colors: [primaryColor, secondaryColor],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
@@ -32,14 +33,17 @@ class ResultadoCard extends StatelessWidget {
           children: [
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       titulo,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: textPrimaryColor,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -47,10 +51,7 @@ class ResultadoCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       subtitulo,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: textPrimaryColor, fontSize: 16),
                     ),
                   ],
                 ),
@@ -60,24 +61,21 @@ class ResultadoCard extends StatelessWidget {
               width: 80,
               height: 60,
               decoration: BoxDecoration(
-                color: Colors.grey[200],
+                color: inputFillColor,
                 borderRadius: const BorderRadius.only(
                   topRight: Radius.circular(16),
                   bottomRight: Radius.circular(16),
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: icons != null
-                    ? icons!.map((icon) => Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          child: Icon(icon, color: Colors.grey[400], size: 28),
-                        )).toList()
-                    : [
-                        Icon(Icons.category, color: Colors.grey[400], size: 28),
-                        Icon(Icons.star_border, color: Colors.grey[400], size: 28),
-                        Icon(Icons.info_outline, color: Colors.grey[400], size: 28),
-                      ],
+              child: Center(
+                child: idSubcategoria != null
+                    ? Image.asset(
+                        'assets/SubLogos/${idSubcategoria}.png',
+                        width: 48,
+                        height: 48,
+                        fit: BoxFit.contain,
+                      )
+                    : Icon(Icons.category, color: iconColor, size: 32),
               ),
             ),
           ],

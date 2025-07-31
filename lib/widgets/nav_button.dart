@@ -18,6 +18,14 @@ class CustomBottomNavBar extends StatelessWidget {
   /// Etiquetas exactas como en tu diseño original
   final List<String> labels;
 
+  static const List<String?> routes = [
+    '/favoritos',
+    '/SearchScreen',
+    '/main_menu',
+    null, // Quizzes
+    null, // Perfil
+  ];
+
   const CustomBottomNavBar({
     Key? key,
     required this.currentIndex,
@@ -59,7 +67,14 @@ class CustomBottomNavBar extends StatelessWidget {
             ),
             child: BottomNavigationBar(
               currentIndex: currentIndex,
-              onTap: onTap,
+              onTap: (index) {
+                onTap(index);
+                final route = routes[index];
+                if (route != null &&
+                    ModalRoute.of(context)?.settings.name != route) {
+                  Navigator.pushReplacementNamed(context, route);
+                }
+              },
               type: BottomNavigationBarType.fixed,
               backgroundColor: Colors.transparent,
               elevation: 0,
@@ -103,7 +118,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 // Solo muestra el círculo para el elemento activo
                 if (currentIndex == index) {
                   return Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       // DEGRADADO EXACTO: Azul claro a verde
                       gradient: const LinearGradient(
@@ -135,7 +150,7 @@ class CustomBottomNavBar extends StatelessWidget {
                   );
                 } else {
                   // Espacio vacío para mantener el espaciado
-                  return const SizedBox(width: 60);
+                  return const SizedBox(width: 40);
                 }
               }),
             ),

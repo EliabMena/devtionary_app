@@ -9,6 +9,8 @@ import 'package:devtionary_app/widgets/btn_google.dart';
 import 'package:devtionary_app/widgets/text_input.dart';
 import 'package:devtionary_app/services/auth_service.dart';
 import 'package:devtionary_app/db/repositorios/terminos_repository.dart';
+import 'package:devtionary_app/db/repositorios/comandos_repository.dart';
+import 'package:devtionary_app/db/repositorios/instrucciones_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 
@@ -142,13 +144,19 @@ class _LoginScreenState extends State<LoginScreen> {
       // Verificar versión de API y sincronizar si es nueva
       try {
         final prefs = await SharedPreferences.getInstance();
-        final response = await http.get(Uri.parse('https://devtionary-api-production.up.railway.app/api/user/health'));
+        final response = await http.get(
+          Uri.parse(
+            'https://devtionary-api-production.up.railway.app/api/user/health',
+          ),
+        );
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
           final apiVersion = data['version'] ?? '';
           final localVersion = prefs.getString('api_version') ?? '';
           if (apiVersion != localVersion) {
             await TerminosRepository().sincronizarTerminos();
+            await ComandosRepository().sincronizarComandos();
+            await InstruccionesRepository().sincronizarInstrucciones();
             await prefs.setString('api_version', apiVersion);
             print('Sincronización realizada por nueva versión: $apiVersion');
           } else {
@@ -159,6 +167,22 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       } catch (e) {
         print('Error al verificar versión y sincronizar: $e');
+      }
+      // Mostrar contenido de las tablas
+      final terminos = await TerminosRepository().getTerminos();
+      print('--- CONTENIDO DE TERMINOS ---');
+      for (var t in terminos) {
+        print(t.toJson());
+      }
+      final comandos = await ComandosRepository().getComandos();
+      print('--- CONTENIDO DE COMANDOS ---');
+      for (var c in comandos) {
+        print(c.toJson());
+      }
+      final instrucciones = await InstruccionesRepository().getInstrucciones();
+      print('--- CONTENIDO DE INSTRUCCIONES ---');
+      for (var i in instrucciones) {
+        print(i.toJson());
       }
       Navigator.pushReplacementNamed(context, '/SearchScreen');
     } else {
@@ -184,6 +208,41 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (result.success) {
       _showMessage('¡Inicio de sesión exitoso!');
+      // Verificar versión de API y sincronizar si es nueva
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final response = await http.get(
+          Uri.parse(
+            'https://devtionary-api-production.up.railway.app/api/user/health',
+          ),
+        );
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          final apiVersion = data['version'] ?? '';
+          final localVersion = prefs.getString('api_version') ?? '';
+          if (apiVersion != localVersion) {
+            print('Sincronizando datos por nueva versión: $apiVersion');
+            try {
+              print('Sincronizando términos...');
+              await TerminosRepository().sincronizarTerminos();
+              print('Sincronizando comandos...');
+              await ComandosRepository().sincronizarComandos();
+              print('Sincronizando instrucciones...');
+              await InstruccionesRepository().sincronizarInstrucciones();
+              await prefs.setString('api_version', apiVersion);
+            } catch (e) {
+              print('Error al sincronizar datos: $e');
+            }
+            print('Sincronización realizada por nueva versión: $apiVersion');
+          } else {
+            print('Versión actual ($apiVersion) ya sincronizada.');
+          }
+        } else {
+          print('No se pudo obtener la versión de la API.');
+        }
+      } catch (e) {
+        print('Error al verificar versión y sincronizar: $e');
+      }
       Navigator.pushReplacementNamed(context, '/SearchScreen');
     } else {
       _showMessage(

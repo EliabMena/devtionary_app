@@ -40,9 +40,9 @@ class Comandos {
       'id_subcategoria': id_subcategoria,
       'nombre_comando': nombre_comando,
       'descripcion': descripcion,
-      'ejemplo': ejemplo,
-      'ejemplo_2': ejemplo_2,
-      'ejemplo_3': ejemplo_3,
+      'ejemplo': ejemplo ?? '',
+      'ejemplo_2': ejemplo_2 ?? '',
+      'ejemplo_3': ejemplo_3 ?? '',
       'fecha_creacion': fecha_creacion,
       'fecha_actualizacion': fecha_actualizacion,
     };

@@ -36,7 +36,7 @@ class Instrucciones {
       'id_subcategoria': id_subcategoria,
       'nombre_instruccion': nombre_instruccion,
       'descripcion': descripcion,
-      'ejemplo': ejemplo,
+      'ejemplo': ejemplo ?? '',
       'fecha_creacion': fecha_creacion,
       'fecha_actualizacion': fecha_actualizacion,
     };
