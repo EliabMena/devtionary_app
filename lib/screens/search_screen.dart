@@ -24,18 +24,36 @@ class _SearchScreenState extends State<SearchScreen> {
   List<dynamic> _results = [];
   bool _loading = false;
 
-  Future<void> _searchAdvanced(String query) async {
+  Future<void> _searchAdvanced(String query, String tipoBusqueda) async {
     setState(() {
       _loading = true;
     });
-
-    try {
-      final terminosRepo = TerminosRepository();
-      final comandosRepo = ComandosRepository();
-      final instruccionesRepo = InstruccionesRepository();
-
+    final terminosRepo = TerminosRepository();
+    final comandosRepo = ComandosRepository();
+    final instruccionesRepo = InstruccionesRepository();
+    final dynamic results;
+    if (tipoBusqueda == 'nombre') {
+      results = await Future.wait([
+        // Búsqueda en nombres
+        terminosRepo.buscarTerminosPorNombre(query),
+        comandosRepo.buscarComandosPorNombre(query),
+        instruccionesRepo.buscarInstruccionesPorNombre(query),
+      ]);
+    } else if (tipoBusqueda == 'descripcion') {
+      results = await Future.wait([
+        terminosRepo.buscarTerminosPorDescripcion(query),
+        comandosRepo.buscarComandosPorDescripcion(query),
+        instruccionesRepo.buscarInstruccionesPorDescripcion(query),
+      ]);
+    } else if (tipoBusqueda == 'subcategoria') {
+      results = await Future.wait([
+        terminosRepo.getTerminosPorSubcategoria(query),
+        comandosRepo.getComandosPorSubcategoria(query),
+        instruccionesRepo.getInstruccionesPorSubcategoria(query),
+      ]);
+    } else {
       // Búsquedas paralelas en nombre Y descripción
-      final results = await Future.wait([
+      results = await Future.wait([
         // Búsqueda en nombres
         terminosRepo.buscarTerminosPorNombre(query),
         comandosRepo.buscarComandosPorNombre(query),
@@ -45,7 +63,8 @@ class _SearchScreenState extends State<SearchScreen> {
         comandosRepo.buscarComandosPorDescripcion(query),
         instruccionesRepo.buscarInstruccionesPorDescripcion(query),
       ]);
-
+    }
+    try {
       // Combinar y eliminar duplicados
       final Set<dynamic> uniqueResults = {};
       for (var resultList in results) {
