@@ -62,7 +62,6 @@ class ComandosRepository {
       }
 
       // Paso 3: La conexión se cierra automáticamente
-      print('Sincronización de comandos completada');
     } catch (e) {
       throw Exception('Error durante la sincronización: $e');
     }
@@ -99,9 +98,6 @@ class ComandosRepository {
       for (var comando in locales) comando.id_comando: comando,
     };
 
-    int actualizadas = 0;
-    int insertadas = 0;
-
     // Revisar comandos de la API
     for (Comandos comandoAPI in api) {
       Comandos? comandoLocal = localesMap[comandoAPI.id_comando];
@@ -109,7 +105,6 @@ class ComandosRepository {
       if (comandoLocal == null) {
         // Situación 3: Nuevo comando en la API - insertarlo
         await db.insert('comandos', comandoAPI.toJson());
-        insertadas++;
       } else if (comandoLocal.fecha_actualizacion !=
           comandoAPI.fecha_actualizacion) {
         // Situación 2.2: Fechas diferentes - actualizar
@@ -119,14 +114,9 @@ class ComandosRepository {
           where: 'id_comando = ?',
           whereArgs: [comandoAPI.id_comando],
         );
-        actualizadas++;
       }
       // Situación 2.1: Fechas iguales - no hacer nada
     }
-
-    print(
-      'Sincronización completada: $insertadas insertadas, $actualizadas actualizadas',
-    );
   }
 
   Future<List<Comandos>> getComandos() async {

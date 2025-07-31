@@ -95,9 +95,6 @@ class TerminosRepository {
       for (var termino in locales) termino.id_termino: termino,
     };
 
-    int actualizadas = 0;
-    int insertadas = 0;
-
     // Revisar términos de la API
     for (Terminos terminoAPI in api) {
       Terminos? terminoLocal = localesMap[terminoAPI.id_termino];
@@ -105,7 +102,6 @@ class TerminosRepository {
       if (terminoLocal == null) {
         // Situación 3: Nuevo término en la API - insertarlo
         await db.insert('terminos', terminoAPI.toJson());
-        insertadas++;
       } else if (terminoLocal.fecha_actualizacion !=
           terminoAPI.fecha_actualizacion) {
         // Situación 2.2: Fechas diferentes - actualizar
@@ -115,7 +111,6 @@ class TerminosRepository {
           where: 'id_termino = ?',
           whereArgs: [terminoAPI.id_termino],
         );
-        actualizadas++;
       }
       // Situación 2.1: Fechas iguales - no hacer nada
     }

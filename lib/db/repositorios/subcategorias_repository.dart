@@ -56,16 +56,12 @@ class SubcategoriasRepository {
       if (subcategoriasLocales.isEmpty) {
         // Situación 1: La tabla está vacía - insertar todas las subcategorías de la API
         await _insertarTodasLasSubcategorias(subcategoriasAPI);
-        print(
-          '${subcategoriasAPI.length} subcategorías insertadas desde la API',
-        );
       } else {
         // Situación 2 y 3: Comparar y sincronizar
         await _compararYSincronizar(subcategoriasLocales, subcategoriasAPI);
       }
 
       // Paso 3: La conexión se cierra automáticamente
-      print('Sincronización de subcategorías completada');
     } catch (e) {
       throw Exception('Error durante la sincronización: $e');
     }
@@ -104,9 +100,6 @@ class SubcategoriasRepository {
       for (var subcat in locales) subcat.id_subcategoria: subcat,
     };
 
-    int actualizadas = 0;
-    int insertadas = 0;
-
     // Revisar subcategorías de la API
     for (Subcategorias subcategoriaAPI in api) {
       Subcategorias? subcategoriaLocal =
@@ -115,7 +108,6 @@ class SubcategoriasRepository {
       if (subcategoriaLocal == null) {
         // Situación 3: Nueva subcategoría en la API - insertarla
         await db.insert('subcategorias', subcategoriaAPI.toJson());
-        insertadas++;
       } else if (subcategoriaLocal.fecha_actualizacion !=
           subcategoriaAPI.fecha_actualizacion) {
         // Situación 2.2: Fechas diferentes - actualizar
@@ -125,14 +117,9 @@ class SubcategoriasRepository {
           where: 'id_subcategoria = ?',
           whereArgs: [subcategoriaAPI.id_subcategoria],
         );
-        actualizadas++;
       }
       // Situación 2.1: Fechas iguales - no hacer nada
     }
-
-    print(
-      'Sincronización completada: $insertadas insertadas, $actualizadas actualizadas',
-    );
   }
 
   String _getErrorMessage(int statusCode) {

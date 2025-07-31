@@ -124,18 +124,19 @@ class DatabaseHelper {
       ''');
 
       await txn.execute('''
-        CREATE TABLE IF NOT EXISTS preguntasa (
+        CREATE TABLE IF NOT EXISTS preguntas (
           id_pregunta INTEGER PRIMARY KEY,
+          id_categoria INTEGER,
+          id_subcategoria INTEGER,
+          pregunta TEXT NOT NULL,
           respuesta_correcta TEXT NOT NULL,
           respuesta_incorrecta_1 TEXT NOT NULL,
           respuesta_incorrecta_2 TEXT NOT NULL,
           respuesta_incorrecta_3 TEXT NOT NULL,
           fecha_creacion TEXT NOT NULL,
           fecha_actualizacion TEXT NOT NULL,
-          id_subcategoria INTEGER,
-          id_categoria INTEGER,
-          FOREIGN KEY (id_subcategoria) REFERENCES subcategorias(id_subcategoria),
-          FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
+          FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
+          FOREIGN KEY (id_subcategoria) REFERENCES subcategorias(id_subcategoria)
         )
       ''');
     });

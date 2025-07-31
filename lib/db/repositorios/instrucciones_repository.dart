@@ -56,16 +56,12 @@ class InstruccionesRepository {
       if (instruccionesLocales.isEmpty) {
         // Situación 1: La tabla está vacía - insertar todas las instrucciones de la API
         await _insertarTodasLasInstrucciones(instruccionesAPI);
-        print(
-          '${instruccionesAPI.length} instrucciones insertadas desde la API',
-        );
       } else {
         // Situación 2 y 3: Comparar y sincronizar
         await _compararYSincronizar(instruccionesLocales, instruccionesAPI);
       }
 
       // Paso 3: La conexión se cierra automáticamente
-      print('Sincronización de instrucciones completada');
     } catch (e) {
       throw Exception('Error durante la sincronización: $e');
     }
@@ -104,9 +100,6 @@ class InstruccionesRepository {
       for (var instruccion in locales) instruccion.id_instruccion: instruccion,
     };
 
-    int actualizadas = 0;
-    int insertadas = 0;
-
     // Revisar instrucciones de la API
     for (Instrucciones instruccionAPI in api) {
       Instrucciones? instruccionLocal =
@@ -115,7 +108,6 @@ class InstruccionesRepository {
       if (instruccionLocal == null) {
         // Situación 3: Nueva instrucción en la API - insertarla
         await db.insert('instrucciones', instruccionAPI.toJson());
-        insertadas++;
       } else if (instruccionLocal.fecha_actualizacion !=
           instruccionAPI.fecha_actualizacion) {
         // Situación 2.2: Fechas diferentes - actualizar
@@ -125,14 +117,9 @@ class InstruccionesRepository {
           where: 'id_instruccion = ?',
           whereArgs: [instruccionAPI.id_instruccion],
         );
-        actualizadas++;
       }
       // Situación 2.1: Fechas iguales - no hacer nada
     }
-
-    print(
-      'Sincronización completada: $insertadas insertadas, $actualizadas actualizadas',
-    );
   }
 
   Future<List<Instrucciones>> getInstrucciones() async {

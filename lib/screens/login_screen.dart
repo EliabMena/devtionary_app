@@ -1,3 +1,7 @@
+import 'package:devtionary_app/db/db_models/preguntas.dart';
+import 'package:devtionary_app/db/db_models/subcategorias.dart';
+import 'package:devtionary_app/db/repositorios/preguntas_repository.dart';
+import 'package:devtionary_app/db/repositorios/subcategorias_repository.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -164,6 +168,8 @@ class _LoginScreenState extends State<LoginScreen> {
             await TerminosRepository().sincronizarTerminos();
             await ComandosRepository().sincronizarComandos();
             await InstruccionesRepository().sincronizarInstrucciones();
+            await PreguntasRepository().sincronizarPreguntas();
+            await SubcategoriasRepository().sincronizarSubcategorias();
             await prefs.setString('api_version', apiVersion);
             print('Sincronización realizada por nueva versión: $apiVersion');
           } else {
