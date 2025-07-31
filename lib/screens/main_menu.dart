@@ -133,6 +133,8 @@ class MainMenu extends StatelessWidget {
                   width: double.infinity, 
                   child: HorizontalCategoryList(
                     subcategoriasFuture: SubcategoriasRepository().getSubcategoriasByCategoryId(1), 
+                    cardSize: 230,
+                    iconSize: 80,
                   ), 
                 ),
                 SizedBox(height: 15),
@@ -140,7 +142,9 @@ class MainMenu extends StatelessWidget {
                 SizedBox( 
                   width: double.infinity, 
                   child: HorizontalCategoryList(
-                    subcategoriasFuture: SubcategoriasRepository().getSubcategoriasByCategoryId(2), 
+                    subcategoriasFuture: SubcategoriasRepository().getSubcategoriasByCategoryId(2),
+                    cardSize: 190,
+                    iconSize: 66,
                   ), 
                 ),
                 SizedBox(height: 15),
@@ -149,6 +153,8 @@ class MainMenu extends StatelessWidget {
                   width: double.infinity, 
                   child: HorizontalCategoryList(
                     subcategoriasFuture: SubcategoriasRepository().getSubcategoriasByCategoryId(3), 
+                    cardSize: 182,
+                    iconSize: 59,
                   ), 
                 ),
               ],

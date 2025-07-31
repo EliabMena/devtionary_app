@@ -4,12 +4,14 @@ import 'package:devtionary_app/widgets/tarjeta_categoria.dart';
 
 class HorizontalCategoryList extends StatelessWidget { 
   final Future<List<Subcategorias>> subcategoriasFuture; 
-  const HorizontalCategoryList({ Key? key, required this.subcategoriasFuture, }) : super(key: key); 
+  final double cardSize;
+  final  double iconSize;
+  const HorizontalCategoryList({ Key? key, required this.subcategoriasFuture, required this.cardSize, required this.iconSize }) : super(key: key); 
   @override 
   Widget build(BuildContext context) { 
     return SizedBox( 
-      width: 230, 
-      height: 230, 
+      width: cardSize, 
+      height: cardSize, 
       child: FutureBuilder<List<Subcategorias>>( 
         future: subcategoriasFuture, 
         builder: (context, snapshot) { 
@@ -54,32 +56,32 @@ class HorizontalCategoryList extends StatelessWidget {
                     gradient = [Color(0xFF7F00FF), Color(0xFFE100FF)]; 
                     iconWidget = Image.asset(
                       'assets/SubLogos/${subcategorias[index].id_subcategoria}.png', 
-                      width: 80, 
-                      height: 80, 
+                      width: iconSize, 
+                      height: iconSize, 
                     );
                     break; 
                   case '2': 
                     gradient = [Color(0xFF005BEA), Color(0xFF00C6FB)]; 
                     iconWidget = Image.asset(
                       'assets/SubLogos/${subcategorias[index].id_subcategoria}.png', 
-                      width: 80, 
-                      height: 80, 
+                      width: iconSize, 
+                      height: iconSize, 
                     );
                     break; 
                   case '3': 
                     gradient = [Color(0xFF00C6FB), Color(0xFF43E97B)]; 
                     iconWidget = Image.asset(
                       'assets/SubLogos/${subcategorias[index].id_subcategoria}.png', 
-                      width: 80, 
-                      height: 80, 
+                      width: iconSize, 
+                      height: iconSize, 
                     );
                     break; 
                   case '4': 
                     gradient = [Color(0xFF7F00FF), Color(0xFFE100FF)]; 
                     iconWidget = Image.asset(
                       'assets/SubLogos/${subcategorias[index].id_subcategoria}.png',  
-                      width: 80, 
-                      height: 80, 
+                      width: iconSize, 
+                      height: iconSize, 
                     );
                     break; 
                   case '5': 
@@ -87,16 +89,16 @@ class HorizontalCategoryList extends StatelessWidget {
                     iconWidget = Image.asset(
                       'assets/SubLogos/${subcategorias[index].id_subcategoria}.png', 
                       color: Colors.white,
-                      width: 80, 
-                      height: 80, 
+                      width: iconSize, 
+                      height: iconSize, 
                     );
                     break; 
                   case '6': 
                     gradient = [Color(0xFF00C6FB), Color(0xFF43E97B)]; 
                     iconWidget = Image.asset(
                       'assets/SubLogos/${subcategorias[index].id_subcategoria}.png', 
-                      width: 80, 
-                      height: 80, 
+                      width: iconSize, 
+                      height: iconSize, 
                     );
                     break; 
                   case '7': 
@@ -104,40 +106,40 @@ class HorizontalCategoryList extends StatelessWidget {
                     iconWidget = Image.asset(
                       'assets/SubLogos/${subcategorias[index].id_subcategoria}.png', 
                       color: Colors.white,
-                      width: 80, 
-                      height: 80, 
+                      width: iconSize, 
+                      height: iconSize, 
                     );
                     break; 
                   case '8': 
                     gradient = [Color(0xFF00C6FB), Color(0xFF43E97B)]; 
                     iconWidget = Image.asset(
                       'assets/SubLogos/${subcategorias[index].id_subcategoria}.png', 
-                      width: 80, 
-                      height: 80, 
+                      width: iconSize, 
+                      height: iconSize, 
                     );
                     break; 
                   case '9': 
                     gradient = [Color(0xFF7F00FF), Color(0xFFE100FF)]; 
                     iconWidget = Image.asset(
                       'assets/SubLogos/${subcategorias[index].id_subcategoria}.png', 
-                      width: 80, 
-                      height: 80, 
+                      width: iconSize, 
+                      height: iconSize, 
                     );
                     break; 
                   case '10': 
                     gradient = [Color(0xFF005BEA), Color(0xFF00C6FB)]; 
                     iconWidget = Image.asset(
                       'assets/SubLogos/${subcategorias[index].id_subcategoria}.png', 
-                      width: 80, 
-                      height: 80, 
+                      width: iconSize, 
+                      height: iconSize, 
                     );
                     break; 
                   case '11': 
                     gradient = [Color(0xFF00C6FB), Color(0xFF43E97B)]; 
                     iconWidget = Image.asset(
                       'assets/SubLogos/${subcategorias[index].id_subcategoria}.png', 
-                      width: 80, 
-                      height: 80, 
+                      width: iconSize, 
+                      height: iconSize, 
                     );
                     break; 
                   case '12': 
@@ -145,32 +147,32 @@ class HorizontalCategoryList extends StatelessWidget {
                     iconWidget = Image.asset(
                       'assets/SubLogos/${subcategorias[index].id_subcategoria}.png', 
                       color: Colors.white,
-                      width: 80, 
-                      height: 80, 
+                      width: iconSize, 
+                      height: iconSize, 
                     );
                     break; 
                   case '13': 
                     gradient = [Color(0xFF005BEA), Color(0xFF00C6FB)]; 
                     iconWidget = Image.asset(
                       'assets/SubLogos/${subcategorias[index].id_subcategoria}.png', 
-                      width: 80, 
-                      height: 80, 
+                      width: iconSize, 
+                      height: iconSize, 
                     );
                     break; 
                   case '14': 
                     gradient = [Color(0xFF00C6FB), Color(0xFF43E97B)]; 
                     iconWidget = Image.asset(
                       'assets/SubLogos/${subcategorias[index].id_subcategoria}.png', 
-                      width: 80, 
-                      height: 80, 
+                      width: iconSize, 
+                      height: iconSize,  
                     );
                     break; 
                   case '15': 
                     gradient = [Color(0xFF7F00FF), Color(0xFFE100FF)]; 
                     iconWidget = Image.asset(
                       'assets/SubLogos/${subcategorias[index].id_subcategoria}.png', 
-                      width: 80, 
-                      height: 80, 
+                      width: iconSize, 
+                      height: iconSize, 
                     );
                     break; 
                   default: 
@@ -181,13 +183,26 @@ class HorizontalCategoryList extends StatelessWidget {
                     ); 
                   } 
                   return Container(
-                    width: 140, 
+                    width: iconSize * 2, 
+                    height: cardSize * 2,
                     margin: EdgeInsets.only(right: 12), 
-                    child: TarjetaCategoria(
-                      nombre: cat.nombre, 
-                      gradient: gradient, 
-                      icono: iconWidget, 
-                    ), 
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context, 
+                          '/search', 
+                          arguments: {
+                            'query': cat.nombre,
+                            'tipoBusqueda': 'subcategoria',
+                          },
+                        );
+                      },
+                      child: TarjetaCategoria(
+                        nombre: cat.nombre, 
+                        gradient: gradient, 
+                        icono: iconWidget,
+                      ),
+                    )
                   ); 
                 }
               ), 

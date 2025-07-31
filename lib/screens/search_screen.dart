@@ -85,6 +85,35 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // Aquí solo inicializa variables, no uses context
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // ✅ Aquí SÍ puedes usar ModalRoute.of(context) de forma segura
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    // Evita volver a ejecutar si ya se hizo (evita duplicados si hay rebuilds)
+    if (args != null && _results.isEmpty) {
+      final String query = args['query'] ?? '';
+      final String tipoBusqueda = args['tipoBusqueda'] ?? 'todos';
+
+      _controller.text = query;
+      _searchAdvanced(query, tipoBusqueda);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: AnimatedContainer(
