@@ -124,7 +124,7 @@ class DatabaseHelper {
       ''');
 
       await txn.execute('''
-        CREATE TABLE IF NOT EXISTS preguntasa (
+        CREATE TABLE IF NOT EXISTS preguntas (
           id_pregunta INTEGER PRIMARY KEY,
           respuesta_correcta TEXT NOT NULL,
           respuesta_incorrecta_1 TEXT NOT NULL,
