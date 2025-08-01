@@ -147,6 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
         'fechaRegistro',
         result.user?.metadata.creationTime?.toIso8601String() ?? 'Sin fecha',
       );
+      // El token ya se guarda en SharedPreferences dentro de AuthService
     }
 
     if (result.success) {
@@ -228,11 +229,18 @@ class _LoginScreenState extends State<LoginScreen> {
     final authService = AuthService();
     final result = await authService.signInWithGoogle();
 
-    if (result.success) {
+    if (result.success && result.user != null) {
+      // Guardar datos de usuario en SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('username', result.user?.displayName ?? 'Usuario');
+      await prefs.setString('email', result.user?.email ?? 'Sin correo');
+      await prefs.setString(
+        'fechaRegistro',
+        result.user?.metadata.creationTime?.toIso8601String() ?? 'Sin fecha',
+      );
       _showMessage('¡Inicio de sesión exitoso!');
       // Verificar versión de API y sincronizar si es nueva
       try {
-        final prefs = await SharedPreferences.getInstance();
         final response = await http.get(
           Uri.parse(
             'https://devtionary-api-production.up.railway.app/api/user/health',

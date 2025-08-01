@@ -61,7 +61,48 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
       );
       print('[addFavorite] statusCode: ${response.statusCode}');
       print('[addFavorite] response.body: ${response.body}');
-      return response.statusCode == 200 || response.statusCode == 201;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else if (response.statusCode == 404 && response.body.contains('Usuario no encontrado')) {
+        // Intentar crear el usuario en el backend y reintentar
+        final prefs = await SharedPreferences.getInstance();
+        final username = prefs.getString('username') ?? 'Usuario Google';
+        final email = prefs.getString('email') ?? 'Sin correo';
+        final fechaRegistro = prefs.getString('fechaRegistro') ?? DateTime.now().toIso8601String();
+        final createUserUrl = Uri.parse('https://devtionary-api-production.up.railway.app/api/user/create');
+        final createUserBody = jsonEncode({
+          'username': username,
+          'email': email,
+          'fechaRegistro': fechaRegistro,
+        });
+        final createUserResponse = await http.post(
+          createUserUrl,
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+          body: createUserBody,
+        );
+        print('[addFavorite] createUser status: ${createUserResponse.statusCode}');
+        print('[addFavorite] createUser body: ${createUserResponse.body}');
+        if (createUserResponse.statusCode == 201 || createUserResponse.statusCode == 200) {
+          // Reintentar agregar favorito
+          final retryResponse = await http.post(
+            url,
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+            },
+            body: body,
+          );
+          print('[addFavorite] retry status: ${retryResponse.statusCode}');
+          print('[addFavorite] retry body: ${retryResponse.body}');
+          return retryResponse.statusCode == 200 || retryResponse.statusCode == 201;
+        }
+        return false;
+      } else {
+        return false;
+      }
     } catch (e) {
       print('[addFavorite] error: $e');
       return false;

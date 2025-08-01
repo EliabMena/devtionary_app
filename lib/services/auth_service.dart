@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../models/service_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -104,11 +106,20 @@ class AuthService {
         credential,
       );
 
-      // Guardar token en SharedPreferences
+      // Guardar token y datos de usuario en SharedPreferences
       String? token = await userCredential.user?.getIdToken();
       if (token != null) {
         final prefs = await SharedPreferences.getInstance();
+        final displayName = userCredential.user?.displayName ?? 'Usuario';
+        final email = userCredential.user?.email ?? 'Sin correo';
+        final fechaRegistro =
+            userCredential.user?.metadata.creationTime?.toIso8601String() ??
+            'Sin fecha';
         await prefs.setString('token', token);
+        await prefs.setString('username', displayName);
+        await prefs.setString('email', email);
+        await prefs.setString('fechaRegistro', fechaRegistro);
+        // Ya no se llama a /api/user/create aquí. Se maneja en el controlador.
       }
       // Retornar resultado exitoso
       return ServiceResult.success(

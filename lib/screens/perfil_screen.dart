@@ -1,3 +1,4 @@
+import 'package:devtionary_app/db/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:devtionary_app/widgets/nav_button.dart';
 import 'package:devtionary_app/Utility/thems/app_colors.dart';
@@ -14,6 +15,102 @@ class PerfilScreen extends StatefulWidget {
 }
 
 class _PerfilScreenState extends State<PerfilScreen> {
+  Future<void> eliminarCuenta() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar cuenta'),
+        content: const Text(
+          '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.',
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Cancelar'),
+            onPressed: () => Navigator.pop(context, false),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Eliminar'),
+            onPressed: () => Navigator.pop(context, true),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No hay sesión activa.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    try {
+      final url = Uri.parse(
+        'https://devtionary-api-production.up.railway.app/api/user',
+      );
+      final response = await http.delete(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        await prefs.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cuenta eliminada correctamente.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pushReplacementNamed(context, '/login');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al eliminar cuenta: ${response.body}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error de red: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> sincronizarDatos() async {
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Sincronizando datos...'),
+          backgroundColor: Colors.blueAccent,
+        ),
+      );
+      await DatabaseHelper.sincronizarDatos();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('¡Datos sincronizados!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al sincronizar: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   Future<void> cambiarContrasenaDialog() async {
     final TextEditingController contrasenaController = TextEditingController();
     final prefs = await SharedPreferences.getInstance();
@@ -247,6 +344,17 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     children: [
                       ListTile(
                         leading: const Icon(
+                          Icons.sync,
+                          color: Colors.blueAccent,
+                        ),
+                        title: const Text(
+                          'Sincronizar datos',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        onTap: sincronizarDatos,
+                      ),
+                      ListTile(
+                        leading: const Icon(
                           Icons.edit,
                           color: Colors.tealAccent,
                         ),
@@ -294,7 +402,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                           'Eliminar cuenta',
                           style: TextStyle(color: Colors.white),
                         ),
-                        onTap: () {},
+                        onTap: eliminarCuenta,
                       ),
                     ],
                   ),

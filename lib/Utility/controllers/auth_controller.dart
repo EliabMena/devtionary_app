@@ -193,8 +193,8 @@ class AuthController {
         firebaseToken: token,
       );
 
-      // 4. Si no existe, registrarlo automáticamente
-      if (!userProfile.success) {
+      // 4. Si no existe, o si hay error 500/otros, intentar registrarlo automáticamente
+      if (!userProfile.success || userProfile.error != null) {
         final registerResult = await _apiService.registerUser(
           email: googleResult.user!.email!,
           username: googleResult.user!.displayName ?? 'Usuario Google',

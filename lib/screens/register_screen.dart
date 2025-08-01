@@ -111,30 +111,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       await prefs.setString('username', _usernameController.text);
       await prefs.setString('email', _emailController.text);
       await prefs.setString('fechaRegistro', DateTime.now().toIso8601String());
-      // Verificar versión de API y sincronizar si es nueva
-      try {
-        final response = await http.get(
-          Uri.parse(
-            'https://devtionary-api-production.up.railway.app/api/user/health',
-          ),
-        );
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
-          final apiVersion = data['version'] ?? '';
-          final localVersion = prefs.getString('api_version') ?? '';
-          if (apiVersion != localVersion) {
-            await DatabaseHelper.sincronizarDatos();
-            await prefs.setString('api_version', apiVersion);
-            print('Sincronización realizada por nueva versión: $apiVersion');
-          } else {
-            print('Versión actual ($apiVersion) ya sincronizada.');
-          }
-        } else {
-          print('No se pudo obtener la versión de la API.');
-        }
-      } catch (e) {
-        print('Error al verificar versión y sincronizar: $e');
-      }
+      // Sincronizar datos después de registro
+      await DatabaseHelper.sincronizarDatos();
       // Navegar automáticamente al menú principal
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/main_menu');
@@ -147,10 +125,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  // Navegacion Y sincronización de datos después de registro con Google
   Future<void> _handleGoogleSignIn() async {
-    await _coordinator.handleGoogleRegister();
-    // Navegar automáticamente al menú principal después de registro con Google
-    if (mounted) {
+    final result = await _coordinator.handleGoogleRegister();
+    if (result != null && result.success && mounted) {
+      await DatabaseHelper.sincronizarDatos();
       Navigator.pushReplacementNamed(context, '/main_menu');
     }
   }

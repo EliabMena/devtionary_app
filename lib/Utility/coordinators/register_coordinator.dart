@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../handlers/register_form_handler.dart';
 import '../managers/register_ui_state_manager.dart';
 import '../helpers/message_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /*
  * Coordinador principal para la pantalla de registro.
@@ -87,8 +88,14 @@ class RegisterCoordinator {
       _showMessage(result.message, isError: !result.success);
 
       if (result.success) {
-        // TODO: Navegar a la pantalla principal cuando esté lista
-        Navigator.pushReplacementNamed(_context, '/main_menu');
+        // Esperar a que el token esté guardado en SharedPreferences antes de navegar
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('token');
+        if (token != null && token.isNotEmpty) {
+          Navigator.pushReplacementNamed(_context, '/main_menu');
+        } else {
+          _showMessage('No se pudo guardar el token de sesión. Intenta de nuevo.', isError: true);
+        }
       }
     } finally {
       _uiStateManager.setLoading(false);
@@ -96,18 +103,12 @@ class RegisterCoordinator {
   }
 
   // Procesa el registro con Google
-  Future<void> handleGoogleRegister() async {
+  Future<RegisterResult?> handleGoogleRegister() async {
     _uiStateManager.setGoogleLoading(true);
-
     try {
       final result = await _formHandler.handleGoogleRegister();
-
       _showMessage(result.message, isError: !result.success);
-
-      if (result.success) {
-        // TODO: Navegar a la pantalla principal cuando esté lista
-        // Navigator.pushReplacementNamed(_context, '/main');
-      }
+      return result;
     } finally {
       _uiStateManager.setGoogleLoading(false);
     }
