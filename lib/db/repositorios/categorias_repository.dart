@@ -118,6 +118,10 @@ class CategoriasRepository {
     }
   }
 
+  Future<List<Categorias>> getCategorias() async {
+    return await _getCategoriasLocales();
+  }
+
   String _getErrorMessage(int statusCode) {
     switch (statusCode) {
       case 401:

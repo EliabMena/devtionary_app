@@ -158,7 +158,13 @@ class PreguntasRepository {
     final List<Map<String, dynamic>> maps = await db.rawQuery(
       //Cambiando el limit se puede cambiar la cantidad de preguntas
       '''
-      SELECT p.* FROM preguntas p
+      SELECT p.pregunta, 
+      p.respuesta_correcta, 
+      p.respuesta_incorrecta_1, 
+      p.respuesta_incorrecta_2, 
+      p.respuesta_incorrecta_3, 
+      sc.nombre FROM preguntas p
+      inner join subcategorias sc ON p.id_subcategoria = sc.id_subcategoria
       inner join categorias c ON p.id_categoria = c.id_categoria
       WHERE nombre = ? 
       ORDER BY RANDOM() 
