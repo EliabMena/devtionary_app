@@ -94,7 +94,7 @@ class PreguntasRepository {
 
     // Crear mapa para búsqueda rápida de preguntas locales
     Map<int, Preguntas> localesMap = {
-      for (var pregunta in locales) pregunta.id_pregunta: pregunta,
+      for (var pregunta in locales) ?pregunta.id_pregunta: pregunta,
     };
 
     // Revisar preguntas de la API
@@ -174,7 +174,7 @@ class PreguntasRepository {
     );
 
     return List.generate(maps.length, (i) {
-      return Preguntas.fromJson(maps[i]);
+      return Preguntas.fromJsonPreguntas(maps[i]);
     });
   }
 
