@@ -103,79 +103,78 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
   }
 
   void applyFilters() {
-  List<String> temp = List.from(favoritos);
-  if (searchQuery.isNotEmpty) {
-    temp = temp
-        .where((fav) => fav.toLowerCase().contains(searchQuery.toLowerCase()))
-        .toList();
-  }
-  if (isAlphabetical) {
-    temp.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
-  }
+    List<String> temp = List.from(favoritos);
+    if (searchQuery.isNotEmpty) {
+      temp = temp
+          .where((fav) => fav.toLowerCase().contains(searchQuery.toLowerCase()))
+          .toList();
+    }
+    if (isAlphabetical) {
+      temp.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    }
 
-  // ✅ Solo llama a setState si el widget aún está montado
-  if (mounted) {
-    setState(() {
-      filteredFavoritos = temp;
-    });
-  }
-}
-
-  Future<void> fetchFavoritos() async {
-  setState(() {
-    isLoading = true;
-  });
-
-  final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('token');
-
-  if (token == null) {
+    // ✅ Solo llama a setState si el widget aún está montado
     if (mounted) {
       setState(() {
+        filteredFavoritos = temp;
+      });
+    }
+  }
+
+  Future<void> fetchFavoritos() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      if (mounted) {
+        setState(() {
+          favoritos = [];
+          filteredFavoritos = [];
+          isLoading = false;
+        });
+      }
+      return;
+    }
+
+    final url = Uri.parse(
+      'https://devtionary-api-production.up.railway.app/api/user/favoritos',
+    );
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        favoritos = data.map((e) => e.toString()).toList();
+      } else {
         favoritos = [];
-        filteredFavoritos = [];
+      }
+    } catch (e) {
+      favoritos = [];
+    }
+
+    // Aplicar filtros y actualizar UI solo si el widget sigue montado
+    applyFilters(); // ← applyFilters() ya tiene `if (mounted)`, ¡muy bien!
+
+    // ✅ Protegemos este último setState también
+    if (mounted) {
+      setState(() {
         isLoading = false;
       });
     }
-    return;
   }
-
-  final url = Uri.parse(
-    'https://devtionary-api-production.up.railway.app/api/user/favoritos',
-  );
-
-  try {
-    final response = await http.get(
-      url,
-      headers: {'Authorization': 'Bearer $token'},
-    );
-
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      favoritos = data.map((e) => e.toString()).toList();
-    } else {
-      favoritos = [];
-    }
-  } catch (e) {
-    favoritos = [];
-  }
-
-  // Aplicar filtros y actualizar UI solo si el widget sigue montado
-  applyFilters(); // ← applyFilters() ya tiene `if (mounted)`, ¡muy bien!
-
-  // ✅ Protegemos este último setState también
-  if (mounted) {
-    setState(() {
-      isLoading = false;
-    });
-  }
-}
   // ...existing code...
   // Eliminar duplicación y corregir cierre de clase
 
   @override
   Widget build(BuildContext context) {
-    print('Construyendo FavoritosScreen');
     return Scaffold(
       backgroundColor: Colors.black,
       body: Container(

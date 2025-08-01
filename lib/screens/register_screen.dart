@@ -94,7 +94,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // Métodos de manejo de formulario que delegan al coordinador
   Future<void> _handleRegister() async {
-    print('PANTALLA: _handleRegister');
     // Deshabilitar el botón inmediatamente para evitar doble llamada
     if (_coordinator.uiState.isLoading) return;
     setState(() {

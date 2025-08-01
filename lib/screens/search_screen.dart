@@ -10,6 +10,7 @@ import 'package:devtionary_app/db/db_models/comandos.dart';
 import 'package:devtionary_app/db/db_models/instrucciones.dart';
 import 'package:devtionary_app/Utility/helpers/subcategoria_helper.dart';
 import 'package:devtionary_app/widgets/resultado_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -204,15 +205,41 @@ class _SearchScreenState extends State<SearchScreen> {
                               : tipo,
                           idSubcategoria: idSubcategoria,
                           onTap: () {
+                            guardarActividadReciente(nombre);
+                            Map<String, dynamic> arguments = {};
+
+                            if (item is Terminos) {
+                              arguments = {
+                                'nombre_termino': item.nombre_termino,
+                                'tabla': 'Término',
+                                'descripcion': item.descripcion,
+                                'ejemplo': item.ejemplo,
+                                'id_subcategoria': item.id_subcategoria,
+                              };
+                            } else if (item is Comandos) {
+                              arguments = {
+                                'nombre_comando': item.nombre_comando,
+                                'tabla': 'Comando',
+                                'descripcion': item.descripcion,
+                                'ejemplo': item.ejemplo,
+                                'ejemplo_2': item.ejemplo_2,
+                                'ejemplo_3': item.ejemplo_3,
+                                'id_subcategoria': item.id_subcategoria,
+                              };
+                            } else if (item is Instrucciones) {
+                              arguments = {
+                                'nombre_instruccion': item.nombre_instruccion,
+                                'tabla': 'Instrucción',
+                                'descripcion': item.descripcion,
+                                'ejemplo': item.ejemplo,
+                                'id_subcategoria': item.id_subcategoria,
+                              };
+                            }
+
                             Navigator.pushNamed(
                               context,
                               '/targetas',
-                              arguments: {
-                                'word': nombre,
-                                'subtitle': subcategoria ?? '',
-                                'description': item.descripcion ?? '',
-                                'isFavorite': false,
-                              },
+                              arguments: arguments,
                             );
                           },
                         ),
@@ -234,5 +261,19 @@ class _SearchScreenState extends State<SearchScreen> {
         },
       ),
     );
+  }
+
+  Future<void> guardarActividadReciente(String termino) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> recientes = prefs.getStringList('recientes') ?? [];
+    // Elimina si ya existe para evitar duplicados
+    recientes.remove(termino);
+    // Inserta al inicio
+    recientes.insert(0, termino);
+    // Mantener solo los 3 más recientes
+    if (recientes.length > 3) {
+      recientes = recientes.sublist(0, 3);
+    }
+    await prefs.setStringList('recientes', recientes);
   }
 }

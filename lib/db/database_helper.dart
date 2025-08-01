@@ -52,22 +52,16 @@ class DatabaseHelper {
     PreguntasRepository PregRepo = PreguntasRepository();
     try {
       // Sincronizar categorías
-      print('Sincronizando categorías...');
       await CatRepo.sincronizarCategorias();
       // Sincronizar subcategorías
-      print('Sincronizando subcategorías...');
       await SubCatRepo.sincronizarSubcategorias();
       // Sincronizar términos
-      print('Sincronizando términos...');
       await TermRepo.sincronizarTerminos();
       // Sincronizar comandos
-      print('Sincronizando comandos...');
       await ComRepo.sincronizarComandos();
       // Sincronizar instrucciones
-      print('Sincronizando instrucciones...');
       await InstruRepo.sincronizarInstrucciones();
       // Sincronizar preguntas
-      print('Sincronizando preguntas...');
       await PregRepo.sincronizarPreguntas();
     } catch (e) {
       throw Exception('Error durante la sincronización: $e');

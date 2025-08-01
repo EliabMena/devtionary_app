@@ -11,28 +11,28 @@ class SelectionScreen extends StatefulWidget {
 }
 
 final List<Map<String, dynamic>> Categorias = [
-      {
-        'id_categoria': 1,
-        'nombre': 'comandos',
-        'colorStart': Color(0xFF7F00FF),
-        'colorEnd': Color(0xFFE100FF),
-        'logo': 'assets/SubLogos/1.png',
-      },
-      {
-        'id_categoria': 2,
-        'nombre': 'instrucciones',
-        'colorStart': Color(0xFF005BEA),
-        'colorEnd': Color(0xFF00C6FB),
-        'logo': 'assets/SubLogos/2.png',
-      },
-      {
-        'id_categoria': 3,
-        'nombre': 'terminos',
-        'colorStart': Color(0xFF00C6FB),
-        'colorEnd': Color(0xFF43E97B),
-        'logo': 'assets/SubLogos/3.png',
-      },
-    ];
+  {
+    'id_categoria': 1,
+    'nombre': 'comandos',
+    'colorStart': Color(0xFF7F00FF),
+    'colorEnd': Color(0xFFE100FF),
+    'logo': 'assets/CatLogos/comandos.png',
+  },
+  {
+    'id_categoria': 2,
+    'nombre': 'instrucciones',
+    'colorStart': Color(0xFF005BEA),
+    'colorEnd': Color(0xFF00C6FB),
+    'logo': 'assets/CatLogos/instrucciones.png',
+  },
+  {
+    'id_categoria': 3,
+    'nombre': 'terminos',
+    'colorStart': Color(0xFF00C6FB),
+    'colorEnd': Color(0xFF43E97B),
+    'logo': 'assets/CatLogos/terminos.png',
+  },
+];
 
 class _SelectionScreenState extends State<SelectionScreen> {
   final int puntuacion = 125;
@@ -77,10 +77,7 @@ class _SelectionScreenState extends State<SelectionScreen> {
             SizedBox(height: 16),
             Text(
               '$puntuacion',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 48,
-              ),
+              style: TextStyle(color: Colors.white, fontSize: 48),
             ),
             SizedBox(height: 32),
             // --- Selector deslizable de subcategorías (más grande y visible) ---
@@ -106,7 +103,8 @@ class _SelectionScreenState extends State<SelectionScreen> {
                       separatorBuilder: (_, __) => SizedBox(width: 16),
                       itemBuilder: (context, index) {
                         final cat = Categorias[index];
-                        final isSelected = cat['id_categoria'] == _selectedCategoria;
+                        final isSelected =
+                            cat['id_categoria'] == _selectedCategoria;
 
                         return GestureDetector(
                           onTap: () {
@@ -120,7 +118,9 @@ class _SelectionScreenState extends State<SelectionScreen> {
                             padding: EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(14),
-                              gradient: LinearGradient(colors: [cat['colorStart'], cat['colorEnd']]),
+                              gradient: LinearGradient(
+                                colors: [cat['colorStart'], cat['colorEnd']],
+                              ),
                               border: isSelected
                                   ? Border.all(color: Colors.white, width: 3)
                                   : null,
@@ -139,7 +139,10 @@ class _SelectionScreenState extends State<SelectionScreen> {
                                   cat['logo'],
                                   width: 80,
                                   height: 80,
-                                  color: [5, 7, 12].contains(cat['id_categoria']) ? Colors.white : null,
+                                  color:
+                                      [5, 7, 12].contains(cat['id_categoria'])
+                                      ? Colors.white
+                                      : null,
                                 ),
                                 SizedBox(height: 6),
                                 Text(
@@ -186,10 +189,7 @@ class _SelectionScreenState extends State<SelectionScreen> {
         onTap: (index) {
           switch (index) {
             case 0:
-              Navigator.pushNamed(
-                context,
-                '/favoritos',
-              );
+              Navigator.pushNamed(context, '/favoritos');
               break;
             case 1:
               Navigator.pushNamed(context, '/search');
@@ -220,12 +220,13 @@ class _SelectionScreenState extends State<SelectionScreen> {
       onPressed: () {
         if (_selectedCategoria != null) {
           final String categoriaNombre = Categorias.firstWhere(
-            (cat) => cat['id_categoria'] == _selectedCategoria)['nombre'];
+            (cat) => cat['id_categoria'] == _selectedCategoria,
+          )['nombre'];
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => JuegoScreen(categoria: categoriaNombre),
-            )
+            ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -235,9 +236,7 @@ class _SelectionScreenState extends State<SelectionScreen> {
       },
       style: OutlinedButton.styleFrom(
         side: BorderSide(color: Colors.white, width: 2),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -254,15 +253,11 @@ class _SelectionScreenState extends State<SelectionScreen> {
             SizedBox(height: 4),
             Text(
               questions,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.white, fontSize: 14),
             ),
           ],
         ),
       ),
     );
-    
   }
 }

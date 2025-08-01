@@ -12,20 +12,6 @@ class WordCardsScreen extends StatefulWidget {
 }
 
 class _WordCardsScreenState extends State<WordCardsScreen> {
-  Future<void> guardarActividadReciente(String termino) async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> recientes = prefs.getStringList('recientes') ?? [];
-    // Elimina si ya existe para evitar duplicados
-    recientes.remove(termino);
-    // Inserta al inicio
-    recientes.insert(0, termino);
-    // Mantener solo los 3 más recientes
-    if (recientes.length > 3) {
-      recientes = recientes.sublist(0, 3);
-    }
-    await prefs.setStringList('recientes', recientes);
-  }
-
   // Índice actual del navbar (1 = Búsqueda activa)
   int _currentIndex = 1;
 
@@ -255,9 +241,6 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
   //  MÉTODO PARA CREAR LA TARJETA DE PALABRA
   Widget _buildWordCard() {
     return GestureDetector(
-      onTap: () {
-        guardarActividadReciente(wordData['word']); //Para que se guarde la actividad reciente tienes que tocar la tarjeta
-      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
@@ -332,37 +315,6 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
               ),
             ),
 
-            // ===== ÁREA GRIS PARA IMAGEN =====
-            Container(
-              width: double.infinity,
-              height: 120,
-              decoration: BoxDecoration(color: Colors.grey[200]),
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.image_outlined,
-                      size: 40,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(width: 20),
-                    Icon(
-                      Icons.settings_outlined,
-                      size: 30,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(width: 20),
-                    Icon(
-                      Icons.description_outlined,
-                      size: 30,
-                      color: Colors.grey[400],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
             // ÁREA DE CONTENIDO CON GRADIENTE
             Container(
               width: double.infinity,
@@ -413,6 +365,9 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
+
+                  // ===== EJEMPLOS =====
+                  ..._buildExamples(),
 
                   // Botón de favorito
                   Align(
@@ -465,6 +420,70 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
         ),
       ),
     );
+  }
+
+  //  MÉTODO PARA CONSTRUIR LOS EJEMPLOS
+  List<Widget> _buildExamples() {
+    final List<Widget> exampleWidgets = [];
+    final List<String> examples = [];
+
+    // Recolectar todos los ejemplos no nulos
+    if (wordData['ejemplo'] != null && wordData['ejemplo'].isNotEmpty) {
+      examples.add(wordData['ejemplo']);
+    }
+    if (wordData['ejemplo_2'] != null && wordData['ejemplo_2'].isNotEmpty) {
+      examples.add(wordData['ejemplo_2']);
+    }
+    if (wordData['ejemplo_3'] != null && wordData['ejemplo_3'].isNotEmpty) {
+      examples.add(wordData['ejemplo_3']);
+    }
+
+    if (examples.isNotEmpty) {
+      // Título para la sección de ejemplos
+      exampleWidgets.add(
+        const Text(
+          'Ejemplo(s):',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+      exampleWidgets.add(const SizedBox(height: 8));
+
+      // Contenedor para los ejemplos
+      exampleWidgets.add(
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.25),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.white.withOpacity(0.3)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: examples.map((example) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  '• $example', // Viñeta para cada ejemplo
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic,
+                    height: 1.4,
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      );
+      exampleWidgets.add(const SizedBox(height: 16));
+    }
+
+    return exampleWidgets;
   }
 
   //  NAVEGACIÓN ENTRE PANTALLAS
