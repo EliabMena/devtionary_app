@@ -166,7 +166,7 @@ class PreguntasRepository {
       sc.nombre FROM preguntas p
       inner join subcategorias sc ON p.id_subcategoria = sc.id_subcategoria
       inner join categorias c ON p.id_categoria = c.id_categoria
-      WHERE nombre = ? 
+      WHERE c.nombre = ? 
       ORDER BY RANDOM() 
       LIMIT 10
     ''',
