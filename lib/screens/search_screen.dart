@@ -95,7 +95,8 @@ class _SearchScreenState extends State<SearchScreen> {
     super.didChangeDependencies();
 
     // ✅ Aquí SÍ puedes usar ModalRoute.of(context) de forma segura
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
     // Evita volver a ejecutar si ya se hizo (evita duplicados si hay rebuilds)
     if (args != null && _results.isEmpty) {

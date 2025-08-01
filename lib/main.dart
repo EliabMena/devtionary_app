@@ -1,4 +1,5 @@
 import 'package:devtionary_app/screens/favoritos_screen.dart';
+import 'package:devtionary_app/screens/juego_screen.dart';
 import 'package:devtionary_app/screens/main_menu.dart';
 import 'package:devtionary_app/screens/perfil_screen.dart';
 import 'package:devtionary_app/screens/register_screen.dart';
@@ -103,7 +104,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       // Usar el tema del sistema automáticamente
-      initialRoute: '/register',
+      initialRoute: '/login',
       routes: {
         '/register': (context) => RegisterScreen(),
         '/login': (context) => LoginScreen(),
@@ -113,6 +114,16 @@ class MyApp extends StatelessWidget {
         '/SearchScreen': (context) => SearchScreen(),
         '/favoritos': (context) => FavoritosScreen(),
         '/perfil': (context) => PerfilScreen(),
+        // '/juego' se manejará en onGenerateRoute para aceptar argumentos
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/juego') {
+          return MaterialPageRoute(
+            builder: (context) => JuegoScreen(categoria: 'terminos'),
+            settings: settings,
+          );
+        }
+        return null;
       },
     );
   }

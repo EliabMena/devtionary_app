@@ -22,7 +22,7 @@ class CustomBottomNavBar extends StatelessWidget {
     '/favoritos',
     '/SearchScreen',
     '/main_menu',
-    null, // Quizzes
+    '/juego', // Quizzes
     '/perfil',
   ];
 

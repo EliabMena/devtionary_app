@@ -15,11 +15,17 @@ class WordCardsScreen extends StatefulWidget {
 }
 
 class _WordCardsScreenState extends State<WordCardsScreen> {
-  Future<void> guardarActividadReciente(String actividad) async {
+  Future<void> guardarActividadReciente(String termino) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> recientes = prefs.getStringList('recientes') ?? [];
-    recientes.insert(0, actividad);
-    if (recientes.length > 3) recientes = recientes.sublist(0, 3);
+    // Elimina si ya existe para evitar duplicados
+    recientes.remove(termino);
+    // Inserta al inicio
+    recientes.insert(0, termino);
+    // Mantener solo los 3 más recientes
+    if (recientes.length > 3) {
+      recientes = recientes.sublist(0, 3);
+    }
     await prefs.setStringList('recientes', recientes);
   }
 
@@ -63,13 +69,18 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
       print('[addFavorite] response.body: ${response.body}');
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
-      } else if (response.statusCode == 404 && response.body.contains('Usuario no encontrado')) {
+      } else if (response.statusCode == 404 &&
+          response.body.contains('Usuario no encontrado')) {
         // Intentar crear el usuario en el backend y reintentar
         final prefs = await SharedPreferences.getInstance();
         final username = prefs.getString('username') ?? 'Usuario Google';
         final email = prefs.getString('email') ?? 'Sin correo';
-        final fechaRegistro = prefs.getString('fechaRegistro') ?? DateTime.now().toIso8601String();
-        final createUserUrl = Uri.parse('https://devtionary-api-production.up.railway.app/api/user/create');
+        final fechaRegistro =
+            prefs.getString('fechaRegistro') ??
+            DateTime.now().toIso8601String();
+        final createUserUrl = Uri.parse(
+          'https://devtionary-api-production.up.railway.app/api/user/create',
+        );
         final createUserBody = jsonEncode({
           'username': username,
           'email': email,
@@ -83,9 +94,12 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
           },
           body: createUserBody,
         );
-        print('[addFavorite] createUser status: ${createUserResponse.statusCode}');
+        print(
+          '[addFavorite] createUser status: ${createUserResponse.statusCode}',
+        );
         print('[addFavorite] createUser body: ${createUserResponse.body}');
-        if (createUserResponse.statusCode == 201 || createUserResponse.statusCode == 200) {
+        if (createUserResponse.statusCode == 201 ||
+            createUserResponse.statusCode == 200) {
           // Reintentar agregar favorito
           final retryResponse = await http.post(
             url,
@@ -97,7 +111,8 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
           );
           print('[addFavorite] retry status: ${retryResponse.statusCode}');
           print('[addFavorite] retry body: ${retryResponse.body}');
-          return retryResponse.statusCode == 200 || retryResponse.statusCode == 201;
+          return retryResponse.statusCode == 200 ||
+              retryResponse.statusCode == 201;
         }
         return false;
       } else {

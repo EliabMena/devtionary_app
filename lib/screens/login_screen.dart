@@ -207,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
       for (var s in subcategorias) {
         print(s.toJson());
       }
-      Navigator.pushReplacementNamed(context, '/SearchScreen');
+      Navigator.pushReplacementNamed(context, '/main_menu');
     } else {
       _showMessage(
         result.error ?? 'Error en el inicio de sesión',
@@ -268,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
       } catch (e) {
         print('Error al verificar versión y sincronizar: $e');
       }
-      Navigator.pushReplacementNamed(context, '/SearchScreen');
+      Navigator.pushReplacementNamed(context, '/main_menu');
     } else {
       _showMessage(
         result.error ?? 'Error en el inicio de sesión con Google',
