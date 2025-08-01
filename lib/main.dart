@@ -1,5 +1,4 @@
 import 'package:devtionary_app/screens/favoritos_screen.dart';
-import 'package:devtionary_app/screens/juego_screen.dart';
 import 'package:devtionary_app/screens/main_menu.dart';
 import 'package:devtionary_app/screens/perfil_screen.dart';
 import 'package:devtionary_app/screens/register_screen.dart';
@@ -10,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:devtionary_app/Utility/thems/app_colors.dart';
+import 'package:devtionary_app/screens/selection_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -114,16 +114,7 @@ class MyApp extends StatelessWidget {
         '/SearchScreen': (context) => SearchScreen(),
         '/favoritos': (context) => FavoritosScreen(),
         '/perfil': (context) => PerfilScreen(),
-        // '/juego' se manejará en onGenerateRoute para aceptar argumentos
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == '/juego') {
-          return MaterialPageRoute(
-            builder: (context) => JuegoScreen(categoria: 'terminos'),
-            settings: settings,
-          );
-        }
-        return null;
+        '/quizz': (context) => SelectionScreen(),
       },
     );
   }

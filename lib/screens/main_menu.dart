@@ -5,27 +5,33 @@ import 'dart:convert';
 import 'package:devtionary_app/Utility/thems/app_colors.dart';
 import 'package:devtionary_app/db/repositorios/subcategorias_repository.dart';
 import 'package:devtionary_app/widgets/lista_categorias.dart';
+import 'package:devtionary_app/db/database_helper.dart';
+
+// ✅ Funciones fuera de la clase
+Future<List<String>> obtenerRecientes() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getStringList('recientes') ?? [];
+}
+
+Future<Map<String, dynamic>?> obtenerInfoPalabra(String palabra) async {
+  final prefs = await SharedPreferences.getInstance();
+  final jsonString = prefs.getString('info_palabra_$palabra');
+  if (jsonString == null) return null;
+  try {
+    return Map<String, dynamic>.from(json.decode(jsonString));
+  } catch (e) {
+    print('Error al decodificar info_palabra_$palabra: $e');
+    return null;
+  }
+}
 
 class MainMenu extends StatelessWidget {
   const MainMenu({super.key});
 
-  Future<List<String>> obtenerRecientes() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getStringList('recientes') ?? [];
-  }
-  
-  // Recupera la información de la palabra desde SharedPreferences (puedes guardar más info si lo necesitas)
-  Future<Map<String, dynamic>?> obtenerInfoPalabra(String palabra) async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonString = prefs.getString('info_palabra_$palabra');
-    if (jsonString == null) return null;
-    return Map<String, dynamic>.from(json.decode(jsonString));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Fondo oscuro
+      backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Text('Menú Principal'),
@@ -75,6 +81,7 @@ class MainMenu extends StatelessWidget {
                 }
                 return Column(
                   children: List.generate(recientes.length, (index) {
+                    final palabra = recientes[index];
                     return Container(
                       margin: EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
@@ -91,21 +98,26 @@ class MainMenu extends StatelessWidget {
                           color: Colors.white,
                         ),
                         title: Text(
-                          recientes[index],
+                          palabra,
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         onTap: () async {
-                          final info = await obtenerInfoPalabra(
-                            recientes[index],
-                          );
-                          if (info != null) {
+                          final resultado = await DatabaseHelper.buscarPorNombre(palabra);
+                          if (resultado != null) {
                             Navigator.pushNamed(
                               context,
                               '/targetas',
-                              arguments: info,
+                              arguments: resultado,
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('No se encontró información para "$palabra"'),
+                                backgroundColor: Colors.red,
+                              ),
                             );
                           }
                         },
@@ -116,6 +128,7 @@ class MainMenu extends StatelessWidget {
               },
             ),
             SizedBox(height: 32),
+
             // Sección Categorías
             Text(
               'Categorías',
@@ -129,33 +142,33 @@ class MainMenu extends StatelessWidget {
             Column(
               children: [
                 Text('Comandos'),
-                SizedBox( 
-                  width: double.infinity, 
+                SizedBox(
+                  width: double.infinity,
                   child: HorizontalCategoryList(
-                    subcategoriasFuture: SubcategoriasRepository().getSubcategoriasByCategoryId(1), 
+                    subcategoriasFuture: SubcategoriasRepository().getSubcategoriasByCategoryId(1),
                     cardSize: 230,
                     iconSize: 80,
-                  ), 
+                  ),
                 ),
                 SizedBox(height: 15),
                 Text('Instrucciones'),
-                SizedBox( 
-                  width: double.infinity, 
+                SizedBox(
+                  width: double.infinity,
                   child: HorizontalCategoryList(
                     subcategoriasFuture: SubcategoriasRepository().getSubcategoriasByCategoryId(2),
                     cardSize: 190,
                     iconSize: 66,
-                  ), 
+                  ),
                 ),
                 SizedBox(height: 15),
                 Text('Términos'),
-                SizedBox( 
-                  width: double.infinity, 
+                SizedBox(
+                  width: double.infinity,
                   child: HorizontalCategoryList(
-                    subcategoriasFuture: SubcategoriasRepository().getSubcategoriasByCategoryId(3), 
+                    subcategoriasFuture: SubcategoriasRepository().getSubcategoriasByCategoryId(3),
                     cardSize: 182,
                     iconSize: 59,
-                  ), 
+                  ),
                 ),
               ],
             ),
@@ -168,38 +181,23 @@ class MainMenu extends StatelessWidget {
         onTap: (index) {
           switch (index) {
             case 0:
-              Navigator.pushNamed(
-                context,
-                '/favoritos',
-              );
+              Navigator.pushNamed(context, '/favoritos');
               break;
             case 1:
               Navigator.pushNamed(context, '/search');
               break;
             case 2:
-              Navigator.pushNamed(context, '/main_menu');
+              // Evita bucle si ya estás aquí
               break;
             case 3:
-              Navigator.pushNamed(
-                context,
-                '',
-              ); //falta implementación de la pantalla de quizzes
+              Navigator.pushNamed(context, '/quizz');
               break;
             case 4:
-              Navigator.pushNamed(
-                context,
-                '/perfil',
-              ); //falta implementación de la pantalla de perfil
+              Navigator.pushNamed(context, '/perfil');
               break;
           }
         },
       ),
     );
   }
-}
-
-class Categoria {
-  final String nombre;
-
-  Categoria({required this.nombre});
 }

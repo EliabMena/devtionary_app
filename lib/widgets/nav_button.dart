@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:devtionary_app/Utility/thems/app_colors.dart';
 
 /// Widget personalizado para barra de navegación inferior con círculo flotante
 /// Replica exactamente el diseño con degradado azul-verde
@@ -22,7 +21,7 @@ class CustomBottomNavBar extends StatelessWidget {
     '/favoritos',
     '/SearchScreen',
     '/main_menu',
-    '/juego', // Quizzes
+    '/quizz', // Quizzes
     '/perfil',
   ];
 

@@ -19,9 +19,9 @@ class JuegoScreen extends StatefulWidget {
 class _JuegoScreenState extends State<JuegoScreen> {
   /// Mapea la categoría local a la categoría esperada por el backend
   String _categoriaApi(String localCategoria) {
-    if (localCategoria == 'terminal') return 'comandos';
-    if (localCategoria == 'lenguajes_programacion') return 'instrucciones';
-    if (localCategoria == 'terminos_programacion') return 'terminos';
+    if (localCategoria == 'comandos') return 'comandos';
+    if (localCategoria == 'instrucciones') return 'instrucciones';
+    if (localCategoria == 'terminos') return 'terminos';
     return 'terminos'; // fallback seguro
   }
 
@@ -271,8 +271,8 @@ class _JuegoScreenState extends State<JuegoScreen> {
                   }
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
+                    child: TextButton(
+                      style: TextButton.styleFrom(
                         backgroundColor: bgColor,
                         foregroundColor: fgColor,
                         minimumSize: const Size.fromHeight(48),

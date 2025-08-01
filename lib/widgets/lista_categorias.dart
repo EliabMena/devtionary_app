@@ -43,7 +43,7 @@ class HorizontalCategoryList extends StatelessWidget {
             ); 
           } // Si todo está bien, obtenemos la lista 
           
-          final subcategorias = snapshot.data!; 
+          final subcategorias = snapshot.data!;
           return SingleChildScrollView( 
             scrollDirection: Axis.horizontal, 
             child: Row( 

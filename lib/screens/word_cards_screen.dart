@@ -1,9 +1,6 @@
 import 'package:devtionary_app/Utility/thems/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:devtionary_app/widgets/nav_button.dart';
-import 'package:devtionary_app/widgets/searchbar.dart';
-import 'package:devtionary_app/widgets/nav_button.dart';
-import 'package:devtionary_app/widgets/searchbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -259,7 +256,7 @@ class _WordCardsScreenState extends State<WordCardsScreen> {
   Widget _buildWordCard() {
     return GestureDetector(
       onTap: () {
-        guardarActividadReciente(wordData['word']);
+        guardarActividadReciente(wordData['word']); //Para que se guarde la actividad reciente tienes que tocar la tarjeta
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 20),

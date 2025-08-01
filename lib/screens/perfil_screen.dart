@@ -1,4 +1,5 @@
 import 'package:devtionary_app/db/database_helper.dart';
+import 'package:devtionary_app/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:devtionary_app/widgets/nav_button.dart';
 import 'package:devtionary_app/Utility/thems/app_colors.dart';
@@ -390,7 +391,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
                           await prefs.remove('username');
                           await prefs.remove('email');
                           await prefs.remove('fechaRegistro');
-                          Navigator.pushReplacementNamed(context, '/login');
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context)=> LoginScreen()), (route) => false,);
                         },
                       ),
                       ListTile(
