@@ -242,7 +242,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
                         decoration: InputDecoration(
                           hintText: 'Buscar por nombre...',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: const Color.fromARGB(255, 44, 44, 44),
                           contentPadding: const EdgeInsets.symmetric(
                             vertical: 0,
                             horizontal: 12,

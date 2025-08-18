@@ -393,7 +393,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
                           await prefs.remove('fechaRegistro');
                           Navigator.pushAndRemoveUntil(
                             context,
-                            MaterialPageRoute(builder: (context)=> LoginScreen()), (route) => false,);
+                            MaterialPageRoute(
+                              builder: (context) => LoginScreen(),
+                            ),
+                            (route) => false,
+                          );
                         },
                       ),
                       ListTile(
@@ -411,54 +415,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
+
                 // Extras
-                Card(
-                  color: Colors.white10,
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 8,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: const Icon(
-                          Icons.help_outline,
-                          color: Colors.blueAccent,
-                        ),
-                        title: const Text(
-                          'Soporte / Ayuda',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onTap: () {},
-                      ),
-                      ListTile(
-                        leading: const Icon(
-                          Icons.privacy_tip,
-                          color: Colors.greenAccent,
-                        ),
-                        title: const Text(
-                          'Términos y Privacidad',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onTap: () {},
-                      ),
-                      ListTile(
-                        leading: const Icon(
-                          Icons.share,
-                          color: Colors.indigoAccent,
-                        ),
-                        title: const Text(
-                          'Redes sociales',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onTap: () {},
-                      ),
-                    ],
-                  ),
-                ),
                 const SizedBox(height: 32),
               ],
             ),

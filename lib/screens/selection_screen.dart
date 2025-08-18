@@ -2,6 +2,9 @@ import 'package:devtionary_app/Utility/thems/app_colors.dart';
 import 'package:devtionary_app/screens/juego_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:devtionary_app/widgets/nav_button.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SelectionScreen extends StatefulWidget {
   const SelectionScreen({Key? key}) : super(key: key);
@@ -35,8 +38,80 @@ final List<Map<String, dynamic>> Categorias = [
 ];
 
 class _SelectionScreenState extends State<SelectionScreen> {
-  final int puntuacion = 125;
+  Map<String, dynamic>? _userProfile;
+  bool _isLoading = true;
+  String _mejorCategoria = '';
+  int _mejorPuntuacion = 0;
+
   var _selectedCategoria = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserProfile();
+  }
+
+  Future<void> _fetchUserProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      setState(() {
+        _isLoading = false;
+      });
+      // Opcional: Mostrar un mensaje si no hay token
+      return;
+    }
+
+    final url = Uri.parse(
+      'https://devtionary-api-production.up.railway.app/api/user/profile',
+    );
+    try {
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final puntos = data['puntos'];
+
+        if (puntos != null) {
+          final int terminos = puntos['terminos'] ?? 0;
+          final int comandos = puntos['comandos'] ?? 0;
+          final int instrucciones = puntos['instrucciones'] ?? 0;
+
+          // Determinar la mejor puntuación y categoría
+          if (terminos >= comandos && terminos >= instrucciones) {
+            _mejorPuntuacion = terminos;
+            _mejorCategoria = 'Términos';
+          } else if (comandos >= terminos && comandos >= instrucciones) {
+            _mejorPuntuacion = comandos;
+            _mejorCategoria = 'Comandos';
+          } else {
+            _mejorPuntuacion = instrucciones;
+            _mejorCategoria = 'Instrucciones';
+          }
+        }
+
+        setState(() {
+          _userProfile = data;
+          _isLoading = false;
+        });
+      } else {
+        // Manejar respuesta de error
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      // Manejar error de conexión
+      setState(() {
+        _isLoading = false;
+      });
+      print('Error al obtener el perfil del usuario: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,19 +141,28 @@ class _SelectionScreenState extends State<SelectionScreen> {
         child: ListView(
           padding: EdgeInsets.all(16),
           children: [
-            Text(
-              'Mejor puntuación en:',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+            if (_isLoading)
+              Center(child: CircularProgressIndicator())
+            else if (_userProfile != null) ...[
+              Text(
+                'Mejor puntuación en: $_mejorCategoria',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              '$puntuacion',
-              style: TextStyle(color: Colors.white, fontSize: 48),
-            ),
+              SizedBox(height: 16),
+              Text(
+                '$_mejorPuntuacion',
+                style: TextStyle(color: Colors.white, fontSize: 48),
+              ),
+            ] else ...[
+              Text(
+                'No se pudieron cargar los puntos',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            ],
             SizedBox(height: 32),
             // --- Selector deslizable de subcategorías (más grande y visible) ---
             Row(
